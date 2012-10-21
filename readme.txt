@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure
 Requires at least: 3.3
 Tested up to: 3.4
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,7 +17,9 @@ IP Blacklist Cloud plugin allows you to blacklist IP addresses from visiting you
 
 == Installation ==
 
-Note: Before downloading and installing plugin, you must accept that plugin sends your website url (using site_url()) and website name (using get_bloginfo(‘name’)) to http://ip-finder.me and show this on relative blacklisted IP. (Example: http://ip-finder.me/wpip?IP=203.81.202.127)
+Note: Before downloading and installing plugin, you must accept that plugin sends your website url (using site_url()), website name (using get_bloginfo(‘name’)) automatically when you blacklist any IP to http://ip-finder.me and show this on relative blacklisted IP. (Example: http://ip-finder.me/wpip?IP=203.81.202.127)
+SpamChecker sends comments data (Name, Email, URL and Comment) to check Spam Percentages based on our database.
+
 
 1. Upload `ip_blacklist_cloud` folder to the `/wp-content/plugins/` directory
 
@@ -44,21 +46,38 @@ For example: http://ip-finder.me/wpip?IP=203.81.202.127
 
 Q1. What data does this plugin submits to http://ip-finder.me/
 
-Ans: This plugin only submits your WordPress site url and site name.
+Ans: * This plugin submits your WordPress site url and site name.
+     * Version 1.1 sends pending comment to http://ip-finder.me/ and find the same comment if it was posted on any other WordPress websites who have installed this plugin.
+     * Sending comment details to cloud requires user action and it is not automatic.
+
 
 Q2. Why does it sends WordPress site url and site name?
 
 Ans: In order to build this IP Cloud valuable to all the users, ip-finder.me save site name and site url only for specific IP (when you block it) so that it gives the attention to other users that this IP could be dangerous for their website.
+
 
 Q3. How and when does it sends data to ip-finder.me
 
 Ans: Plugin sends the data only on two conditions:
   1. When you blacklist any IP on your website, it saves the data on ip-finder.me and add your site to the list of websites who have blocked that specific IP.
   2. When you delete any IP from blacklist, it sends request to ip-finder.me to remove your site from the list of websites who have blocked that specific IP.
+  3. When you request to check Spam Percentage of any comment.
 
 Q4. If we block any IP, can they access example.com/wp-admin or still post comments?
 
 Ans: NO! This is the main reason why this plugin has been built to avoid spamming on WordPress based websites. you can test this on demo server (Please see Demo section below)
+
+
+Q6. What data does it sends for checking spam percentage of a comment?
+
+Ans: It sends Name, Email, URL and the contents of the comments.
+
+Q7. What data do you keep in your database?
+
+Ans: We keep details of 
+	* Blacklist IPs
+	* Websites' names and URLs who have blocked that specific IP address
+	* Comments details on which users have doubt that they are SPAM.
 
 
 == Screenshots ==
@@ -69,3 +88,18 @@ Ans: NO! This is the main reason why this plugin has been built to avoid spammin
 
 You can test this plugin before downloading and installing on demo server.
 http://demo.ip-finder.me/demo-details/
+
+== Changelog ==
+
+= 1.1 =
+* Find Spam Pecentage of any pending comment by posting details to http://ip-finder.me/
+
+
+= 0.1 =
+* Initial Release
+
+
+== Upgrade Notice ==
+
+= 1.1 =
+* Added SpamChecker to check the percentage of SPAM for each comment. It shows Percentages for: Name, Email, URL and Contents of Comment.

@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: IP Blacklist Cloud
-Plugin URI: 
+Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website.
-Version: 0.1
+Version: 1.1
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -183,6 +183,7 @@ function IPBLC_IP_column( $columns )
 {
 	$columns['IPBLC_IP'] = __( 'IP' );
 	$columns['IPBLC_IP_status'] = __( 'IP Staus' );
+	$columns['IPBLC_IP_spam'] = __( 'Spam Percentage' );
 	return $columns;
 }
 function IPBLC_IP_value( $column, $comment_ID )
@@ -226,6 +227,14 @@ global $wpdb;
 		}
 
 	}
+	if ( 'IPBLC_IP_spam' == $column ) {
+
+			echo "<div id=\"IPSpam-$comment_ID\" class=\"IPSpam\">N/A</div>";
+			echo "<a href=\"#\" id=\"IPSpamAction-$comment_ID\" class=\"IPSpamAction\" name=\"$comment_ID\">Calculate</a>";
+
+	}
+
+	
 }
 function create_sql()
 {
@@ -308,5 +317,73 @@ add_filter( 'manage_edit-comments_columns', 'IPBLC_IP_column' );
 add_filter( 'manage_comments_custom_column', 'IPBLC_IP_value', 10, 2 );
 
 add_action('init', 'IPBLC_blockIP');  
+
+
+function load_custom_IPBLC_admin_style() {
+        echo "<style type=\"text/css\">\n
+	.IPSpam, .IPSpamAction{ display: inline; margin: 0px 10px;}\n		
+	</style>\n
+	";
+
+}
+
+function IPJS()
+{
+
+?>
+<script type="text/javascript">
+
+jQuery(".IPSpamAction").click(function(){
+
+	var comment_ID=jQuery(this).attr('name');
+	var spamperc=jQuery("#IPSpam-"+comment_ID);
+
+	spamperc.css("color","#000000");
+	spamperc.html("<img src=\"<?php echo site_url(); ?>/wp-admin/images/wpspin_light.gif\">");
+
+
+
+<?php
+	//------plugin url---
+	$plugin_dir_name=plugin_dir_url(__FILE__);
+	//------SpamCheckerfile---
+	$SpamCheckerUrl=$plugin_dir_name."SpamChecker.php";
+
+
+?>
+
+		var reRequest=jQuery.ajax({
+			  type: "POST",
+			  url: "<?php echo $SpamCheckerUrl; ?>",
+			  data: {comment_ID: comment_ID},
+  			dataType: "html"
+			});
+
+		reRequest.done(function(msg,response) {
+			if(msg)
+			{
+			spamperc.css("color","#000000");
+			spamperc.html(msg);
+			}
+		});
+
+		reRequest.fail(function(jqXHR, textStatus) {
+			spamperc.css("color","#FF0000");
+			spamperc.html("<?php echo __("Error"); ?>");
+		});
+
+	return false;
+
+
+});
+
+</script>
+<?php
+
+
+}
+add_action( 'admin_enqueue_scripts', 'load_custom_IPBLC_admin_style' );
+
+add_action('admin_footer', 'IPJS');
 
 ?>
