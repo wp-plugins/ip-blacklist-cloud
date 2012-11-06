@@ -365,9 +365,40 @@ if($_GET['blacklist'])
 
 
 
-
-
+$scriptname=$_SERVER['SCRIPT_NAME'];
+if(strpos($scriptname,"edit-comments.php")>0)
+{
 ?>
+<style>
+#IPBLC_message_like
+{
+	position: fixed;
+	bottom: 20px;
+	float: left;
+	left: 5px;
+	border:1px solid #99AA99;
+	background-color: #EFEFEF;
+	font-size: 12px;
+	//font-weight: bold;
+	padding: 4px;
+	color: #000000;
+
+}
+#IPBLC_message_like a
+{
+	color: #222222;
+}
+</style>
+<div id="IPBLC_message_like">
+<a href="http://wordpress.org/extend/plugins/ip-blacklist-cloud/" target="_blank">Rate IP Blacklist Cloud</a>
+</div>
+<?php
+}
+?>
+
+
+
+
 <script type="text/javascript">
 
 jQuery(".IPSpamAction").click(function(){
