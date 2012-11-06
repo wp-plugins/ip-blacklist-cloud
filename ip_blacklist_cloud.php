@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website.
-Version: 1.1
+Version: 1.2
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -252,16 +252,29 @@ global $wpdb;
 		dbDelta($sql);
 	}
 
-if($_GET['blacklist'])
-{
-	if($_SERVER['SCRIPT_NAME']=="/wp-admin/edit-comments.php")
+
+
+
+	if($_GET['blacklist'])
 	{
 
-		ip_added();
-		add_action('admin_footer', 'ip_added_message');
+		//print_r($_SERVER);
 
+
+		$referer=$_SERVER['HTTP_REFERER'];
+		if(strpos($referer,"edit-comments.php")>0)
+		{
+
+			ip_added();
+
+		}
 	}
-}
+
+
+
+
+
+
 
 
 
@@ -329,6 +342,30 @@ function load_custom_IPBLC_admin_style() {
 
 function IPJS()
 {
+
+
+
+if($_GET['blacklist'])
+{
+
+	//print_r($_SERVER);
+
+
+	$referer=$_SERVER['HTTP_REFERER'];
+	
+
+	if(strpos($referer,"edit-comments.php")>0)
+	{
+		ip_added_message();
+
+	}
+}
+
+
+
+
+
+
 
 ?>
 <script type="text/javascript">

@@ -91,6 +91,9 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
+= 1.2 =
+* Fixed Blacklist option on "Comments" Page for non-subdomain WordPress websites.
+
 = 1.1 =
 * Find Spam Pecentage of any pending comment by posting details to http://ip-finder.me/
 
@@ -101,5 +104,5 @@ http://demo.ip-finder.me/demo-details/
 
 == Upgrade Notice ==
 
-= 1.1 =
-* Added SpamChecker to check the percentage of SPAM for each comment. It shows Percentages for: Name, Email, URL and Contents of Comment.
+= 1.2 =
+* Fixed Blacklist option on "Comments" Page for non-subdomain WordPress websites.
