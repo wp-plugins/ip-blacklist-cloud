@@ -9,6 +9,11 @@
 <div id="icon-options-general" class="icon32"><br /></div>  
 <h2>Add IP to Blacklist</h2>
 
+<BR>
+<B>NOTE:</B> After adding any comment to blacklist, please submit comment on IP-FINDER.ME to help others regarding the issue related to that specific IP.
+<BR>
+
+
 <?php
 global $wpdb,$IP_globale,$IP_error,$found;
 

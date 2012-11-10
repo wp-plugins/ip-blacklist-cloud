@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website.
-Version: 1.2
+Version: 1.3
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -112,7 +112,7 @@ $IP=$IP_global;
 <?php
 	
 
-	echo "<div id=\"IPBLC_message_blacklist\">$IP added to blacklist.</div>";
+	echo "<div id=\"IPBLC_message_blacklist\">$IP added to blacklist. Please comment on <a href=\"http://ip-finder.me/wpip?IP=$IP\" target=\"_blank\">IP-FINDER.ME</a></div>";
 
 	}
 	else
@@ -155,7 +155,7 @@ $IP=$IP_global;
 
 	}
 
-	echo "<script>jQuery('#IPBLC_message_blacklist').delay(3500).fadeOut(1000); jQuery('#IPBLC_message_blacklist').click(function(){ jQuery(this).hide(); });</script>";
+	echo "<script>jQuery('#IPBLC_message_blacklist').delay(8500).fadeOut(6000); jQuery('#IPBLC_message_blacklist').click(function(){ jQuery(this).hide(); });</script>";
 
 }
 
@@ -163,6 +163,7 @@ function page_IPBLC_actions() {
 	add_menu_page( "IP Blacklist", "IP Blacklist", "manage_options", "wp-IPBLC");
 	add_submenu_page( "wp-IPBLC", "Blacklist", "Blacklist", "manage_options", "wp-IPBLC", "blacklist_tool" );
 	add_submenu_page( "wp-IPBLC", "Add IP to Blacklist", "Add IP to Blacklist", "manage_options", "wp-IPBLC-Add", "blacklist_add" );
+	add_submenu_page( "wp-IPBLC", "Blacklist Statistics", "Blacklist Statistics", "manage_options", "wp-IPBLC-stats", "blacklist_stats" );
 } 
 
 
@@ -175,6 +176,34 @@ function blacklist_tool() {
 function blacklist_add() {
 
 	include "blacklist-add.php";
+
+}
+function blacklist_stats() {
+
+
+
+//---post data to ip-finder.me
+$contextData = array ( 
+                'method' => 'POST',
+                'header' => "Connection: close\r\n". 
+             "Referer: ".site_url()."\r\n");
+ 
+// Create context resource for our request
+$context = stream_context_create (array ( 'http' => $contextData ));
+ 
+// Read page rendered as result of your POST request
+
+$link="http://ip-finder.me/analysis";
+$analysis =  file_get_contents (
+                  $link,  // page url
+                  false,
+                  $context);
+
+
+
+echo $analysis;
+
+
 
 }
 
@@ -366,7 +395,12 @@ if($_GET['blacklist'])
 
 
 $scriptname=$_SERVER['SCRIPT_NAME'];
-if(strpos($scriptname,"edit-comments.php")>0)
+
+
+$page=$_GET['page'];
+
+
+if((strpos($scriptname,"edit-comments.php")>0) || (strpos($scriptname,"admin.php")>0 && ($page=="wp-IPBLC-stats" || $page=="wp-IPBLC" || $page=="wp-IPBLC-Add")) )
 {
 ?>
 <style>

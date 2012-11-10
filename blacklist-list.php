@@ -6,6 +6,14 @@
 <div class="wrap">
 <div id="icon-options-general" class="icon32"><br /></div>  
 <h2>IP Blacklist</h2>
+
+<BR>
+<B>NOTE:</B> After adding any comment to blacklist, please submit comment on IP-FINDER.ME to help others regarding the issue related to that specific IP.
+<BR>
+
+
+
+
 <?php
 global $wpdb;
 
@@ -188,7 +196,7 @@ $xyzzz=$pageNum+10;
 
 <td class="username column-username"><?php echo $this_IP->IP; ?></td>
 <td class="name column-name">
-	<a href="http://ip-finder.me/wpip?IP=<?php echo $IP; ?>" target="_blank" title="IP Details on IP-Finder.me">Blacklist Cloud Comments</a>
+	<a href="http://ip-finder.me/wpip?IP=<?php echo $IP; ?>" target="_blank" title="IP Details on IP-Finder.me">Submit or Read Comments</a>
 </td>
 <td class="name column-name"><?php echo date("M d, Y",$this_IP->timestamp); ?></td>
 <td class="name column-name"><a href="?page=wp-IPBLC&del=<?php echo $this_IP->id; ?>">Delete</a></td>
