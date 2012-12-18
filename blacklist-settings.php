@@ -27,8 +27,91 @@ global $wpdb;
 
 		update_option('IPBLC_auto_comments',$_POST['auto_comments']);
 		update_option('IPBLC_protected',$_POST['IPBLC_protected']);
+
+
+
+		$cloudemail=$_POST['cloud_email'];
+		$cloudkey=$_POST['cloud_key'];
+
+		if($cloudemail=="" && $cloudkey=="")
+		{
+		update_option('IPBLC_cloud_email',"");
+		update_option('IPBLC_cloud_key',"");
+		}
+
+		if($cloudemail && $cloudkey)
+		{
+			if(filter_var($cloudemail, FILTER_VALIDATE_EMAIL))
+			{
+
+		//---post blacklist data to ip-finder.me
+
+		$contextData = array ( 
+		'method' => 'POST',
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n"); 
+
+		$context = stream_context_create (array ( 'http' => $contextData ));
+
+
+		$email2=urlencode($cloudemail);
+		$cloudkey2=urlencode($cloudkey);
+
+$link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$cloudkey2;
+
+
+		$post_to_cloud =  file_get_contents (
+		$link,
+		false,
+		$context);
+
+		//echo $post_to_cloud;
+
+
+		if($post_to_cloud=="-1")
+		{
+		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
+<p><strong>Invalid email address or cloudkey for Cloud Account.</strong></p></div>";
+		}
+		elseif($post_to_cloud=="-2")
+		{
+			
+		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
+<p><strong>Your Cloud Account has expired.</strong></p></div>";
+
+
+		}
+		elseif($post_to_cloud)
+		{
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
 <p><strong>Settings saved.</strong></p></div>";
+
+		update_option('IPBLC_cloud_email',$cloudemail);
+		update_option('IPBLC_cloud_key',$cloudkey);
+
+		}
+
+				
+				
+
+			}
+			else
+			{
+		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
+<p><strong>Invalid Email format.</strong></p></div>";
+
+
+			}
+
+		}
+		else
+		{
+		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
+<p><strong>Settings saved.</strong></p></div>";
+		}
+
+
+
 	}
 
 	
@@ -49,6 +132,64 @@ global $wpdb;
 		update_option('IPBLC_protected','2');
 		$IPBLC_protected=get_option('IPBLC_protected');
 	}
+
+
+	$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
+	$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
+
+	if($IPBLC_cloud_email && $IPBLC_cloud_key)
+	{
+		//---post blacklist data to ip-finder.me
+
+		$contextData = array ( 
+		'method' => 'POST',
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n"); 
+
+		$context = stream_context_create (array ( 'http' => $contextData ));
+
+
+		$email2=urlencode($IPBLC_cloud_email);
+
+$link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$IPBLC_cloud_key;
+
+
+		$post_to_cloud =  file_get_contents (
+		$link,
+		false,
+		$context);
+
+		//echo $post_to_cloud;
+
+
+		if($post_to_cloud=="-1")
+		{
+			
+		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
+<p><strong>Invalid email address or cloudkey for Cloud Account.</strong></p></div>";
+
+
+		}
+		elseif($post_to_cloud=="-2")
+		{
+			
+		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
+<p><strong>Your Cloud Account has expired.</strong></p></div>";
+
+
+		}
+		elseif($post_to_cloud)
+		{
+		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
+<p><strong>Your Cloud Account will expire on ".date("d-m-Y",$post_to_cloud).".</strong></p></div>";
+
+
+		}
+	}
+
+
+
+
 
 ?>
 
@@ -109,6 +250,33 @@ $optioni_2="selected";
 <option value="2" <?php echo $optioni_2; ?>>Yes</option>
 
 </select>
+</td>
+</tr>
+
+
+<tr valign="top">
+<td>
+<h3>Cloud Account</h3>
+</td>
+<td>
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+Email: 
+</td>
+<td>
+<input type=input name="cloud_email" id="cloud_email" value="<?php echo $IPBLC_cloud_email; ?>" class="regular-text" style="width: 130px;">
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+Cloud Key: 
+</td>
+<td>
+<input type=input name="cloud_key" id="cloud_key" value="<?php echo $IPBLC_cloud_key; ?>" class="regular-text" style="width: 130px;">
 </td>
 </tr>
 

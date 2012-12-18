@@ -4,18 +4,22 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure
 Requires at least: 3.3
 Tested up to: 3.5
-Stable tag: 1.4
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 
 
-Blacklist IP Addresses from visiting your WordPress website.
+Blacklist IP Addresses from visiting your WordPress website and Usernames from spamming!!
 
 
 == Description ==
 
 IP Blacklist Cloud plugin allows you to blacklist IP addresses from visiting your WordPress website. Also, it submits your website link to the blocked IP database on [http://ip-finder.me](http://ip-finder.me/) which gives the other users to view how many sites have blocked the specific IP and see their comments.
+New feature has been added to plugin which allows you to block usernames from spamming (comments) on your website.
+
+
+Premium Service (Cloud Account) is available at: http://ip-finder.me/cloudaccount/ for those who runs more than one or two WordPress based websites. This allows to them to maintain database on IP Blacklist Cloud server and import or export between their websites using same account.
 
 
 == Installation ==
@@ -71,6 +75,7 @@ Q7. What data do you keep in your database?
 Ans: We keep details of 
 
 	* Blacklist IPs
+	* Blacklisted Usernames
 	* Websites' names and URLs who have blocked that specific IP address
 	* Comments details on which users have doubt that they are SPAM.
 
@@ -86,6 +91,12 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
+
+= 1.5 =
+* Fixed "Delete IP" function on IP Blacklist page.
+* Blacklist Usernames to avoid spamming from same user on your website.
+* Visit counter for both IP and Usernames has been added on their respective menu pages.
+* PREMIUM SERVICE option has been added on settings pages of IP Blacklist plugin. (See details at: http://ip-finder.me/cloudaccount/ )
 
 = 1.4 =
 * Spam Checker bugs fixed for posting comments to IP Blacklist Cloud.

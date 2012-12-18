@@ -68,7 +68,8 @@ $comment_author_website=$commentData->comment_author_url;
 
 
 
-
+if($comment_author!="admin")
+{
 
 
 
@@ -135,5 +136,11 @@ curl_close($handle);
 	echo $response;
 
 
+}
+else
+{
 
+	echo "no reports for admin";
+
+}
 ?>	
