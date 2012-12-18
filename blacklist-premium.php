@@ -122,7 +122,7 @@ padding: 4px;
 	<input type="submit" name="restoreToCloud" id="restoreToCloud" class="button-primary" value="Restore Cloud" style="width: 130px;">
 </td>
 <td>
-	Delete IP and Username blacklist database of Cloud Account and retore it with this website IP blacklist database.
+	Delete IP and Username blacklist database of Cloud Account and retore it with this website database.
 </td>
 </tr>
 
