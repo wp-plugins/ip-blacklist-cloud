@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure
 Requires at least: 3.3
 Tested up to: 3.5
-Stable tag: 1.5
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,9 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
+
+= 1.6 =
+* Fixed Cloud Account functions for directory based WordPress websites.
 
 = 1.5 =
 * Fixed "Delete IP" function on IP Blacklist page.

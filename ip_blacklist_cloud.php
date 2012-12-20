@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming.
-Version: 1.5
+Version: 1.6
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */

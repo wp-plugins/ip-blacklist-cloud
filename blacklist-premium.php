@@ -165,7 +165,7 @@ var cloudResult=jQuery("#cloudResult");
 
 		var reRequest=jQuery.ajax({
 			  type: "POST",
-			  url: "<?php echo site_url(); ?>",
+			  url: "<?php echo site_url(); ?>/",
 			data: {action: "verifyCloudAccount"},
   			dataType: "html"
 			});
@@ -222,7 +222,7 @@ var cloudResult=jQuery("#cloudResult");
 
 		var reRequest=jQuery.ajax({
 			  type: "POST",
-			  url: "<?php echo site_url(); ?>",
+			  url: "<?php echo site_url(); ?>/",
 			data: {action: "verifyCloudAccount"},
   			dataType: "html"
 			});
@@ -276,7 +276,7 @@ function updateToCloud()
 
 		var reRequest=jQuery.ajax({
 			  type: "POST",
-			  url: "<?php echo site_url(); ?>",
+			  url: "<?php echo site_url(); ?>/",
 			data: {action: "updateToCloud"},
   			dataType: "html"
 			});
@@ -317,7 +317,7 @@ function updateFromCloud()
 
 		var reRequest=jQuery.ajax({
 			  type: "POST",
-			  url: "<?php echo site_url(); ?>",
+			  url: "<?php echo site_url(); ?>/",
 			data: {action: "updateFromCloud"},
   			dataType: "html"
 			});
@@ -360,7 +360,7 @@ function updateFromCloud()
 
 		var reRequest=jQuery.ajax({
 			  type: "POST",
-			  url: "<?php echo site_url(); ?>",
+			  url: "<?php echo site_url(); ?>/",
 			data: {action: "verifyCloudAccount"},
   			dataType: "html"
 			});
@@ -417,7 +417,7 @@ function updateFromCloud()
 
 		var reRequest=jQuery.ajax({
 			  type: "POST",
-			  url: "<?php echo site_url(); ?>",
+			  url: "<?php echo site_url(); ?>/",
 			data: {action: "verifyCloudAccount"},
   			dataType: "html"
 			});
@@ -471,7 +471,7 @@ function restoreToCloud()
 
 		var reRequest=jQuery.ajax({
 			  type: "POST",
-			  url: "<?php echo site_url(); ?>",
+			  url: "<?php echo site_url(); ?>/",
 			data: {action: "restoreToCloud"},
   			dataType: "html"
 			});
@@ -512,7 +512,7 @@ function restoreFromCloud()
 
 		var reRequest=jQuery.ajax({
 			  type: "POST",
-			  url: "<?php echo site_url(); ?>",
+			  url: "<?php echo site_url(); ?>/",
 			data: {action: "restoreFromCloud"},
   			dataType: "html"
 			});
