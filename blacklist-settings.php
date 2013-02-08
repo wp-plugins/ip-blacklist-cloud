@@ -21,6 +21,9 @@
 global $wpdb;
 
 
+		update_option('IPBLC_cloud_email',"");
+		update_option('IPBLC_cloud_key',"");
+
 
 	if($_POST['update_IPBLC'])
 	{
@@ -30,8 +33,12 @@ global $wpdb;
 
 
 
-		$cloudemail=$_POST['cloud_email'];
-		$cloudkey=$_POST['cloud_key'];
+		//$cloudemail=$_POST['cloud_email'];
+		//$cloudkey=$_POST['cloud_key'];
+
+
+		$cloudemail="";
+		$cloudkey="";
 
 		if($cloudemail=="" && $cloudkey=="")
 		{
@@ -253,44 +260,296 @@ $optioni_2="selected";
 </td>
 </tr>
 
-
-<tr valign="top">
-<td>
-<h3>Cloud Account</h3>
-</td>
-<td>
-</td>
-</tr>
-
-<tr valign="top">
-<td>
-Email: 
-</td>
-<td>
-<input type=input name="cloud_email" id="cloud_email" value="<?php echo $IPBLC_cloud_email; ?>" class="regular-text" style="width: 130px;">
-</td>
-</tr>
-
-<tr valign="top">
-<td>
-Cloud Key: 
-</td>
-<td>
-<input type=input name="cloud_key" id="cloud_key" value="<?php echo $IPBLC_cloud_key; ?>" class="regular-text" style="width: 130px;">
-</td>
-</tr>
-
-
-
-
-
 <tr valign="top" valign="top">
 <td colspan=2 height=60>
 <input type="submit" name="update_IPBLC" id="update_IPBLC" value="Save Changes" class="button-primary">
 </td>
 </tr>
+
 </table>
 </form>
+
+
+<h3>Import/Export Blacklisted IP and Usernames Database</h3>
+
+<table cellspacing=2 cellpadding=2 class="form-table" style="width: 550px;">
+
+
+<tr valign="top">
+<td>
+Export: 
+</td>
+<td>
+	<input type="submit" name="ExportCloud" id="ExportCloud" class="button-primary" value="Export Database" style="width: 160px;">
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td>
+Import: 
+</td>
+<td>
+<?php
+
+
+if(!$_FILES['importCSV'])
+{
+
+?>
+
+<form method="post" ENCTYPE="multipart/form-data">
+CSV File: 
+
+<input type="file" name="importCSV" id="importCSV" accept=".csv"><BR>
+	<input type="submit" name="ImportCloud" id=ImportCloud" class="button-primary" value="Upload File" style="width: 160px;">
+
+
+</form>
+<?php
+}
+else
+{
+	$fileX=$_FILES['importCSV'];
+	$ext=explode(".",$fileX['name']);
+	
+	$ext=$ext[count($ext)-1];
+
+	if(strtolower($ext)=="csv")
+	{
+		$tempName=$fileX['tmp_name'];
+		$filename=dirname(__FILE__)."/".$fileX['name'];
+
+		move_uploaded_file($tempName,$filename);
+		?>
+
+
+<input type="submit" name="ImportCloud" id="ImportCloud" class="button-primary" value="Import (<?php echo $fileX['name']; ?>)">
+
+<script>
+var exportResult=jQuery("#exportResult");
+var ajaxloader="<img src=\"<?php echo site_url(); ?>/wp-admin/images/wpspin_light.gif\">";
+
+	jQuery("#ImportCloud").click(function(){
+
+		exportResult.html("Preparing..."+ajaxloader);
+
+		var reRequest=jQuery.ajax({
+			  type: "POST",
+			  url: "<?php echo site_url(); ?>/",
+			data: {action: "importCSVIPCloud", filename: "<?php echo $fileX['name']; ?>"},
+  			dataType: "html"
+			});
+
+		reRequest.done(function(msg) {
+			result=msg;
+
+			
+			if(result)
+			{
+				if(result=="-1")
+				{
+					exportResult.html("<font color=red>File not found!</font>");
+				}
+				else if(result=="[]")
+				{
+					exportResult.html("<font color=red>File is empty!</font>");
+				}
+				else
+				{
+					exportResult.html("Updating Database..."+ajaxloader);
+					submitToDB(jQuery.parseJSON(result));
+
+				}
+			}
+			else
+			{
+				exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+				//updateToCloud();
+			}
+
+		});
+
+		reRequest.fail(function(jqXHR, textStatus) {
+			//msg_box.show();
+			exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+			result=false;	
+		});
+
+
+	return false;
+
+	});
+
+
+
+
+
+function submitToDB(Data)
+{
+	totalData=Data.length;
+	DataDone=0;	
+	var IP_Data="";
+	var username_Data="";
+	for(i in Data)
+	{
+		if(Data[i].IP)
+		{
+			IP_Data=Data[i].IP;
+			submitToDBIP(IP_Data);
+		}
+		else if(Data[i].USERNAME)
+		{
+			username_Data=Data[i].USERNAME;
+			submitToDBUsername(username_Data);
+			
+		}
+
+	}
+
+}
+
+
+
+
+
+
+function submitToDBIP(IP) 
+{
+
+
+		var reRequest=jQuery.ajax({
+			  type: "POST",
+			  url: "<?php echo site_url(); ?>/",
+			data: {action: "submitToDBIP", IP: IP},
+  			dataType: "html"
+			});
+
+		reRequest.done(function(msg) {
+			result=msg;
+			//alert(result);
+
+			if(result)
+			{
+				
+
+					DataDone++;
+
+					if(DataDone==totalData)
+					{
+						exportResult.html("Updated Database.");
+					}	
+			}
+			else
+			{
+				exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+				//updateToCloud();
+			}
+
+		});
+
+		reRequest.fail(function(jqXHR, textStatus) {
+			//msg_box.show();
+			exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+			result=false;	
+		});
+
+
+
+
+
+
+
+}
+
+function submitToDBUsername(username) 
+{
+
+
+		var reRequest=jQuery.ajax({
+			  type: "POST",
+			  url: "<?php echo site_url(); ?>/",
+			data: {action: "submitToDBUSER", USER: username},
+  			dataType: "html"
+			});
+
+		reRequest.done(function(msg) {
+			result=msg;
+			//alert(result);
+
+			if(result)
+			{				
+
+					DataDone++;
+
+					if(DataDone==totalData)
+					{
+						exportResult.html("Updated Database.");
+					}	
+			}
+			else
+			{
+				exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+				//updateToCloud();
+			}
+
+		});
+
+		reRequest.fail(function(jqXHR, textStatus) {
+			//msg_box.show();
+			exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+			result=false;	
+		});
+
+
+
+
+
+
+
+}
+
+
+
+
+
+</script>
+
+		<?php
+
+		
+	}
+}
+?>
+
+</td>
+</tr>
+
+
+</table>
+
+<BR><BR><BR>
+
+<div id="exportResult" style="font-weight: bold;"></div>
+
+
+
+<script>
+
+var exportResult=jQuery("#exportResult");
+
+	jQuery("#ExportCloud").click(function(){
+
+		window.location.href="<?php echo site_url(); ?>/?action=exportIPCloud";
+
+	return false;
+
+	});
+
+
+</script>
+
 
 
 

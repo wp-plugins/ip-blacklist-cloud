@@ -124,7 +124,7 @@ $post_to_cloud =  file_get_contents (
 
 //--Posts per page
 
-$rowsPerPage = 15;
+$rowsPerPage = 30;
 
 
 
@@ -150,9 +150,59 @@ if(isset($_GET['page_num']))
 
 $offset = ($pageNum - 1) * $rowsPerPage;
 
-
+$page_num=$pageNum;
 
 //---------------------------------------------------------------------------------
+
+
+
+
+$orderby=$_GET['orderby'];
+$order=$_GET['order'];
+$sort1="sortable";
+$sort2="sortable";
+$sort3="sortable";
+$sort4="sortable";
+
+if(!$order)
+{
+	$order="desc";
+}
+if(!$orderby)
+{
+	$orderby="timestamp";
+}
+if(!$page_num)
+{
+	$page_num="1";
+}
+if($orderby=="timestamp")
+{
+	$sort1="sorted";
+}
+else if($orderby=="id")
+{
+	$sort2="sorted";
+}
+else if($orderby=="IP")
+{
+	$sort3="sorted";
+}
+else if($orderby=="visits")
+{
+	$sort4="sorted";
+}
+
+
+
+
+	$current_order="asc";
+	if($order=="asc")
+	{
+		$current_order="desc";
+	}
+
+
 
 
 
@@ -166,9 +216,9 @@ $offset = ($pageNum - 1) * $rowsPerPage;
 
 
 
-		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY timestamp DESC");
+		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order");
 
-		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY timestamp DESC LIMIT $offset, $rowsPerPage");
+		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
 
 		//$totalIP=count($totalcomments);
 
@@ -184,7 +234,7 @@ $offset = ($pageNum - 1) * $rowsPerPage;
 
 
 
-	$self="?page=wp-IPBLC-list";
+	$self="?page=wp-IPBLC-list&orderby=$orderby&order=$order";
 
 		$maxPage = ceil($totalIP/$rowsPerPage);
 
@@ -274,7 +324,7 @@ if($pageNum<$maxPage-9)
 
 $xyzzz=$pageNum+10;
 
-      $nav .= "- <a HREF = \"$self&page_num$xyzzz\">&gt;&gt;</a>";
+      $nav .= "- <a HREF = \"$self&page_num=$xyzzz\">&gt;&gt;</a>";
 
 }
 
@@ -293,9 +343,6 @@ $xyzzz=$pageNum+10;
 
 
 
-
-
-
 ?>
 
 
@@ -308,16 +355,38 @@ $xyzzz=$pageNum+10;
 
 
 
-<thead>
+	<thead>
 
 	<tr>
 
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">ID</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">IP</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Details</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Added on</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Visited after blocking</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Actions</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 40px;">
+<a href="?page=wp-IPBLC-list&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>ID</span><span class="sorting-indicator"></span>
+</a>
+		</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort3; ?> <?php echo $order; ?>'  style="text-align: left;">
+<a href="?page=wp-IPBLC-list&orderby=IP&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>IP</span><span class="sorting-indicator"></span>
+</a>
+
+
+		</th>
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 230px;">Details</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 200px;">
+<a href="?page=wp-IPBLC-list&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>Added on</span><span class="sorting-indicator"></span>
+</a>
+
+		</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort3; ?> <?php echo $order; ?>'  style="text-align: left;  width: 160px;">
+
+<a href="?page=wp-IPBLC-list&orderby=visits&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>Visited after blocking</span><span class="sorting-indicator"></span>
+</a>
+
+
+		</th>
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 120px;">Actions</th>
 
 	</tr>
 
@@ -331,16 +400,38 @@ $xyzzz=$pageNum+10;
 
 	<tr>
 
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">ID</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">IP</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left;">
+<a href="?page=wp-IPBLC-list&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>ID</span><span class="sorting-indicator"></span>
+</a>
+		</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort3; ?> <?php echo $order; ?>'  style="text-align: left;">
+<a href="?page=wp-IPBLC-list&orderby=IP&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>IP</span><span class="sorting-indicator"></span>
+</a>
+
+
+		</th>
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Details</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Added on</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Visited after blocking</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left;">
+<a href="?page=wp-IPBLC-list&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>Added on</span><span class="sorting-indicator"></span>
+</a>
+
+		</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort3; ?> <?php echo $order; ?>'  style="text-align: left;">
+
+<a href="?page=wp-IPBLC-list&orderby=visits&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>Visited after blocking</span><span class="sorting-indicator"></span>
+</a>
+
+
+		</th>
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Actions</th>
 
-
-
 	</tr>
+
+
 
 
 

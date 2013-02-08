@@ -68,7 +68,7 @@ global $wpdb,$USER_globale,$USER_error,$found;
 				$time=time();
 
 
-
+/*
 					$post_IP=$wpdb->insert( 
 
 						$table, 
@@ -90,6 +90,11 @@ global $wpdb,$USER_globale,$USER_error,$found;
 						) 
 
 					);
+*/
+
+
+					$wpdb->query("INSERT INTO $table (USERNAME,timestamp) VALUES('$USER','$time')");
+//$wpdb->print_error();
 
 
 

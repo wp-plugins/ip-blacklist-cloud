@@ -3,8 +3,8 @@ Contributors: ad33lx
 Donate link: 
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure
 Requires at least: 3.3
-Tested up to: 3.5
-Stable tag: 1.6
+Tested up to: 3.5.1
+Stable tag: 1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ IP Blacklist Cloud plugin allows you to blacklist IP addresses from visiting you
 New feature has been added to plugin which allows you to block usernames from spamming (comments) on your website.
 
 
-Premium Service (Cloud Account) is available at: http://ip-finder.me/cloudaccount/ for those who runs more than one or two WordPress based websites. This allows to them to maintain database on IP Blacklist Cloud server and import or export between their websites using same account.
+Premium Service (Cloud Account) is no more available on our server. Now you can use Import / Export function.
 
 
 == Installation ==
@@ -92,6 +92,13 @@ http://demo.ip-finder.me/demo-details/
 == Changelog ==
 
 
+= 1.7 =
+* Cloud Account (Premium) function has been disabled due to problems in connecting with our server.
+* Import / Export option added in Settings page.
+* Ajax blacklist function for IP and Username added on Comments page. Page will not refresh anymore.
+* Sorting option added on IP Blacklist and Username Blacklist page. You can now check Blacklisted IP or Usernames visits after they are blocked. 
+* Fixed Auto posting of comments to our server for spam check.
+
 = 1.6 =
 * Fixed Cloud Account functions for directory based WordPress websites.
 
@@ -120,6 +127,10 @@ http://demo.ip-finder.me/demo-details/
 
 == Upgrade Notice ==
 
-= 1.4 =
-* Spam Checker bugs fixed for posting comments to IP Blacklist Cloud.
-* Auto submit comment to IP Blacklist Cloud when visitor post any comment to your website (You can turn off this feature).
+= 1.7 =
+* Cloud Account (Premium) function has been disabled due to problems in connecting with our server.
+* Import / Export option added in Settings page.
+* Ajax blacklist function for IP and Username added on Comments page. Page will not refresh anymore.
+* Sorting option added on IP Blacklist and Username Blacklist page. You can now check Blacklisted IP or Usernames visits after they are blocked. 
+* Fixed Auto posting of comments to our server for spam check.
+

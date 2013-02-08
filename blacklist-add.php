@@ -69,7 +69,7 @@ global $wpdb,$IP_globale,$IP_error,$found;
 				$time=time();
 
 
-
+/*
 					$post_IP=$wpdb->insert( 
 
 						$table, 
@@ -91,6 +91,12 @@ global $wpdb,$IP_globale,$IP_error,$found;
 						) 
 
 					);
+*/
+				
+
+					$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES('$IP','$time')");
+
+//$wpdb->print_error();
 
 
 
