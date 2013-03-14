@@ -207,33 +207,6 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?em
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 650px;">
 
-<tr valign="top">
-<td>
-<b>Auto post comments to Cloud for spam reports:</b> 
-</td>
-<td>
-<select id="auto_comments" name="auto_comments"  style="width: 80px;">
-<?php
-if($IPBLC_auto_comments=="1")
-{
-$optionh_1="selected";
-}
-elseif($IPBLC_auto_comments=="2")
-{
-$optionh_2="selected";
-}
-
-?>
-
-<option value="1" <?php echo $optionh_1; ?>>No</option>
-<option value="2" <?php echo $optionh_2; ?>>Yes</option>
-
-</select>
-</td>
-</tr>
-
-
-
 
 <tr valign="top">
 <td>

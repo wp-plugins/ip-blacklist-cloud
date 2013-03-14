@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming.
-Version: 1.7
+Version: 1.8
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -373,7 +373,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?em
 
 		if($post_to_cloud!="-1" && $post_to_cloud!="-2")
 		{
-	add_submenu_page( "wp-IPBLC", "Cloud Account Service", "Cloud Account Service", "manage_options", "wp-IPBLC-premium", "blacklist_premium" );
+	//add_submenu_page( "wp-IPBLC", "Cloud Account Service", "Cloud Account Service", "manage_options", "wp-IPBLC-premium", "blacklist_premium" );
 
 			
 		}
@@ -2157,7 +2157,10 @@ function postToCloud($comment_id)
 	}
 }
 
-add_action('comment_post','postToCloud');
+//-----disable auto post to cloud-----------
+//add_action('comment_post','postToCloud');
+
+
 add_action( 'admin_enqueue_scripts', 'load_custom_IPBLC_admin_style' );
 add_action('admin_footer', 'IPJS');
 add_action( 'comment_form', 'protected_comment_link' );

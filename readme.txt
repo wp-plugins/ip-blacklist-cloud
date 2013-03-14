@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 1.7
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,9 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
+= 1.8 =
+* Reduced server connection time.
+* Disabled auto submission of Comments for spam check. You must "Calculate" it manually from now.
 
 = 1.7 =
 * Cloud Account (Premium) function has been disabled due to problems in connecting with our server.
@@ -127,10 +130,6 @@ http://demo.ip-finder.me/demo-details/
 
 == Upgrade Notice ==
 
-= 1.7 =
-* Cloud Account (Premium) function has been disabled due to problems in connecting with our server.
-* Import / Export option added in Settings page.
-* Ajax blacklist function for IP and Username added on Comments page. Page will not refresh anymore.
-* Sorting option added on IP Blacklist and Username Blacklist page. You can now check Blacklisted IP or Usernames visits after they are blocked. 
-* Fixed Auto posting of comments to our server for spam check.
-
+= 1.8 =
+* Reduced server connection time.
+* Disabled auto submission of Comments for spam check. You must "Calculate" it manually from now.

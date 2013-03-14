@@ -73,7 +73,7 @@ if($comment_author!="admin")
 
 
 
-$url="http://ip-finder.me/spamcheck";
+$url="http://ip-finder.me/spamcheck2/";
 
 
 
@@ -83,7 +83,7 @@ $handle = curl_init($url);
 
 
 
- curl_setopt($handle, CURLOPT_POSTFIELDS,"Cauthor=$comment_author&Cemail=$comment_email&Curl=$comment_website&Ccomment=$comment_content&author_url="
+ curl_setopt($handle, CURLOPT_POSTFIELDS,"Cauthor=$comment_author&Cversion=1.8&Cemail=$comment_email&Curl=$comment_website&Ccomment=$comment_content&author_url="
 
 .urlencode($comment_author_website));
 
