@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 1.8
+Stable tag: 1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,12 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
+= 1.9 =
+* Added "Failed Logins" sub-menu which shows details of IP, user agent and POST query variables.
+* Shows counter while importing CSV (Updating Database... x of xx).
+* Fixed Tables of Blacklisted IP addresses and Usernames.
+* Removed annoying "Rate IP Blacklist" message.
+
 = 1.8 =
 * Reduced server connection time.
 * Disabled auto submission of Comments for spam check. You must "Calculate" it manually from now.
@@ -130,6 +136,8 @@ http://demo.ip-finder.me/demo-details/
 
 == Upgrade Notice ==
 
-= 1.8 =
-* Reduced server connection time.
-* Disabled auto submission of Comments for spam check. You must "Calculate" it manually from now.
+
+= 1.9 =
+* Added "Failed Logins" sub-menu which shows details of IP, user agent and POST query variables.
+* Shows counter while importing CSV (Updating Database... x of xx).
+* Fixed Tables of Blacklisted IP addresses and Usernames.

@@ -359,7 +359,7 @@ $xyzzz=$pageNum+10;
 
 	<tr>
 
-		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 40px;">
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort2; ?> <?php echo $order; ?>'  style="text-align: left; width: 50px;">
 <a href="?page=wp-IPBLC-list&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>ID</span><span class="sorting-indicator"></span>
 </a>
@@ -378,7 +378,7 @@ $xyzzz=$pageNum+10;
 </a>
 
 		</th>
-		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort3; ?> <?php echo $order; ?>'  style="text-align: left;  width: 160px;">
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort4; ?> <?php echo $order; ?>'  style="text-align: left;  width: 180px;">
 
 <a href="?page=wp-IPBLC-list&orderby=visits&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>Visited after blocking</span><span class="sorting-indicator"></span>
@@ -386,7 +386,7 @@ $xyzzz=$pageNum+10;
 
 
 		</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 120px;">Actions</th>
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 100px;">Actions</th>
 
 	</tr>
 
@@ -398,9 +398,10 @@ $xyzzz=$pageNum+10;
 
 	<tfoot>
 
+
 	<tr>
 
-		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left;">
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort2; ?> <?php echo $order; ?>'  style="text-align: left; width: 50px;">
 <a href="?page=wp-IPBLC-list&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>ID</span><span class="sorting-indicator"></span>
 </a>
@@ -412,14 +413,14 @@ $xyzzz=$pageNum+10;
 
 
 		</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Details</th>
-		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left;">
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 230px;">Details</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 200px;">
 <a href="?page=wp-IPBLC-list&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>Added on</span><span class="sorting-indicator"></span>
 </a>
 
 		</th>
-		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort3; ?> <?php echo $order; ?>'  style="text-align: left;">
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort4; ?> <?php echo $order; ?>'  style="text-align: left;  width: 180px;">
 
 <a href="?page=wp-IPBLC-list&orderby=visits&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>Visited after blocking</span><span class="sorting-indicator"></span>
@@ -427,9 +428,11 @@ $xyzzz=$pageNum+10;
 
 
 		</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;">Actions</th>
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 100px;">Actions</th>
 
 	</tr>
+
+
 
 
 

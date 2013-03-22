@@ -3,6 +3,11 @@
 
 
 
+		$js_url =get_bloginfo('template_directory');
+		$upload_d = wp_upload_dir();
+		$upload_url=$upload_d['baseurl'];
+		$upload_dir=$upload_d['basedir'];
+
 
 //---start admin options
 
@@ -143,6 +148,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?em
 
 	$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
 	$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
+/*
 
 	if($IPBLC_cloud_email && $IPBLC_cloud_key)
 	{
@@ -194,6 +200,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?em
 		}
 	}
 
+*/
 
 
 
@@ -265,8 +272,7 @@ Import:
 </td>
 <td>
 <?php
-
-
+		
 if(!$_FILES['importCSV'])
 {
 
@@ -292,7 +298,9 @@ else
 	if(strtolower($ext)=="csv")
 	{
 		$tempName=$fileX['tmp_name'];
-		$filename=dirname(__FILE__)."/".$fileX['name'];
+		$filename=$upload_dir."/".$fileX['name'];
+
+
 
 		move_uploaded_file($tempName,$filename);
 		?>
@@ -331,14 +339,14 @@ var ajaxloader="<img src=\"<?php echo site_url(); ?>/wp-admin/images/wpspin_ligh
 				}
 				else
 				{
-					exportResult.html("Updating Database..."+ajaxloader);
+					exportResult.html("Updating Database... "+ajaxloader);
 					submitToDB(jQuery.parseJSON(result));
 
 				}
 			}
 			else
 			{
-				exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+				exportResult.html("<font color=red>Your server is down! Unable to connect to file.</font>");
 				//updateToCloud();
 			}
 
@@ -346,7 +354,7 @@ var ajaxloader="<img src=\"<?php echo site_url(); ?>/wp-admin/images/wpspin_ligh
 
 		reRequest.fail(function(jqXHR, textStatus) {
 			//msg_box.show();
-			exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+			exportResult.html("<font color=red>Your server is down! Unable to connect to file.</font>");
 			result=false;	
 		});
 
@@ -357,16 +365,19 @@ var ajaxloader="<img src=\"<?php echo site_url(); ?>/wp-admin/images/wpspin_ligh
 
 
 
+	var perc=0;
 
-
+	var DataDone2=0;
 function submitToDB(Data)
 {
 	totalData=Data.length;
 	DataDone=0;	
+	DataDone2=0;	
 	var IP_Data="";
 	var username_Data="";
 	for(i in Data)
 	{
+
 		if(Data[i].IP)
 		{
 			IP_Data=Data[i].IP;
@@ -407,8 +418,6 @@ function submitToDBIP(IP)
 			{
 				
 
-					DataDone++;
-
 					if(DataDone==totalData)
 					{
 						exportResult.html("Updated Database.");
@@ -416,16 +425,38 @@ function submitToDBIP(IP)
 			}
 			else
 			{
-				exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+				exportResult.html("<font color=red>Your server is down! Unable to connect to file.</font>");
 				//updateToCloud();
 			}
+
+					DataDone2++;
+					
+					exportResult.html("Updating Database... "+DataDone2+" of "+totalData+" "+ajaxloader);
+
+					if(DataDone2==totalData)
+					{
+						exportResult.html("Updated Database.");
+					}	
+
+
 
 		});
 
 		reRequest.fail(function(jqXHR, textStatus) {
 			//msg_box.show();
-			exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+			exportResult.html("<font color=red>Your server is down! Unable to connect to file.</font>");
+
+					DataDone2++;
+					
+					exportResult.html("Updating Database... "+DataDone2+" of "+totalData+" "+ajaxloader);
+
+					if(DataDone2==totalData)
+					{
+						exportResult.html("Updated Database.");
+					}	
+
 			result=false;	
+
 		});
 
 
@@ -453,9 +484,6 @@ function submitToDBUsername(username)
 
 			if(result)
 			{				
-
-					DataDone++;
-
 					if(DataDone==totalData)
 					{
 						exportResult.html("Updated Database.");
@@ -463,16 +491,38 @@ function submitToDBUsername(username)
 			}
 			else
 			{
-				exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+				exportResult.html("<font color=red>Your server is down! Unable to connect to file.</font>");
 				//updateToCloud();
 			}
+
+					DataDone2++;
+					
+					exportResult.html("Updating Database... "+DataDone2+" of "+totalData+" "+ajaxloader);
+
+					if(DataDone2==totalData)
+					{
+						exportResult.html("Updated Database.");
+					}	
+
 
 		});
 
 		reRequest.fail(function(jqXHR, textStatus) {
 			//msg_box.show();
-			exportResult.html("<font color=red>Error Connecting Cloud Account Please Try Again.</font>");
+			exportResult.html("<font color=red>Your server is down! Unable to connect to file.</font>");
+
+					DataDone2++;
+					
+					exportResult.html("Updating Database... "+DataDone2+" of "+totalData+" "+ajaxloader);
+
+					if(DataDone2==totalData)
+					{
+						exportResult.html("Updated Database.");
+					}	
+
+
 			result=false;	
+
 		});
 
 

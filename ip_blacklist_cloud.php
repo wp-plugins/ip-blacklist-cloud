@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming.
-Version: 1.8
+Version: 1.9
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -320,14 +320,48 @@ function user_added_message()
 }
 
 
+function blacklist_failed_login()
+{
+
+	include "blacklist-failed-login.php";
 
 
-
+}
 
 function page_IPBLC_actions() 
 {  
 
+
+	global $wpdb;
+	$newFailed=0;
+	$table1=$wpdb->prefix."IPBLC_login_failed";
+	$table2= $wpdb->prefix."IPBLC_blacklist";
+	$countMain="";
+
+	$rr=$wpdb->get_results("SELECT * FROM $table1 t1 WHERE NOT EXISTS (SELECT 1 FROM $table2 t2 WHERE t1.IP = t2.IP)");
+
+	//print_r($rr);
+
+	if($rr)
+	{
+		$newFailed=count($rr);
+		$countMain='<span class="awaiting-mod count-'.$newFailed.'"><span class="pending-count">'.$newFailed.'</span></span>';
+	}
+
+	if($newFailed==0)
+	{
+		$newFailed="";
+		$countMain="";
+	}
+
+	if($newFailed>0)
+	{
+	add_menu_page( "IP Blacklist", "IP Blacklist $countMain", "manage_options", "wp-IPBLC","",plugins_url()."/ip-blacklist-cloud/icon.png");
+	}
+	else
+	{
 	add_menu_page( "IP Blacklist", "IP Blacklist", "manage_options", "wp-IPBLC","",plugins_url()."/ip-blacklist-cloud/icon.png");
+	}
 	add_submenu_page( "wp-IPBLC", "Settings", "Settings", "manage_options", "wp-IPBLC", "blacklist_settings" );
 
 	add_submenu_page( "wp-IPBLC", "IP Blacklist", "IP Blacklist", "manage_options", "wp-IPBLC-list", "blacklist_tool" );
@@ -336,7 +370,14 @@ function page_IPBLC_actions()
 	add_submenu_page( "wp-IPBLC", "Username Blacklist", "User Blacklist", "manage_options", "wp-IPBLC-list-user", "blacklist_tool_user" );
 	add_submenu_page( "wp-IPBLC", "Add username to Blacklist", "Add User to Blacklist", "manage_options", "wp-IPBLC-Add-User", "blacklist_add_user" );
 
-
+	if($newFailed>0)
+	{
+	add_submenu_page( "wp-IPBLC", "Failed Login", "<font color=red>Failed Login ($newFailed)</font>", "manage_options", "wp-IPBLC-failed-login", "blacklist_failed_login" );
+	}
+	else
+	{
+	add_submenu_page( "wp-IPBLC", "Failed Login", "Failed Login", "manage_options", "wp-IPBLC-failed-login", "blacklist_failed_login" );
+	}
 	add_submenu_page( "wp-IPBLC", "Blacklist Statistics", "Blacklist Statistics", "manage_options", "wp-IPBLC-stats", "blacklist_stats" );
 
 	add_submenu_page( "wp-IPBLC", "Support", "Support", "manage_options", "wp-IPBLC-support", "blacklist_support" );
@@ -539,6 +580,24 @@ function create_sql()
 {
 
 	global $wpdb;
+
+	if(!($wpdb->query("SELECT * FROM ".$wpdb->prefix."IPBLC_login_failed"))) 
+	{
+
+		$sql = "CREATE TABLE ".$wpdb->prefix."IPBLC_login_failed (
+		id INT(60) UNSIGNED NOT NULL AUTO_INCREMENT,
+		IP VARCHAR(200) NOT NULL, 
+		useragent VARCHAR(500) NOT NULL, 
+		variables TEXT NOT NULL, 
+		timestamp INT(200) NOT NULL,
+		UNIQUE KEY id (id)
+		);";
+
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+		dbDelta($sql);
+	}
+
+
 
 
 	if(!($wpdb->query("SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist"))) 
@@ -990,7 +1049,15 @@ $post_to_cloud =  file_get_contents (
 	{
 		if(current_user_can( 'manage_options' ) && $_REQUEST['filename'])
 		{
-			$filename= dirname(__FILE__)."/".$_REQUEST['filename'];
+
+
+
+
+				$js_url =get_bloginfo('template_directory');
+				$upload_d = wp_upload_dir();
+				$upload_url=$upload_d['baseurl'];
+				$upload_dir=$upload_d['basedir'];
+				$filename= $upload_dir."/".$_REQUEST['filename'];
 
 			
 			//echo "file: $filename<BR>";
@@ -1023,10 +1090,7 @@ $post_to_cloud =  file_get_contents (
 
 		exit();
 	}
-
 	//------end Import-----
-
-
 
 	if($_POST['action']=="verifyCloudAccount")
 	{
@@ -1963,6 +2027,38 @@ add_filter( 'manage_comments_custom_column', 'IPBLC_IP_value', 10, 2 );
 
 add_action('init', 'IPBLC_blockIP');  
 
+
+add_action('wp_login_failed','IPBLC_login_failed');
+
+function IPBLC_login_failed(){
+
+	global $wpdb;
+
+
+	$postedData="";
+	//print_r($_SERVER);
+	$visitorIP=$_SERVER['REMOTE_ADDR'];
+	$visitor_time=$_SERVER['REQUEST_TIME'];
+	$visitor_user_agent=$_SERVER['HTTP_USER_AGENT'];
+
+	if($_POST)
+	{
+		foreach($_POST as $k=>$v)
+		{
+			$postedData.="<font color=green>$k</font> => <font color=red>$v</font><BR>";
+		}
+
+	}
+
+	$table=$wpdb->prefix."IPBLC_login_failed";
+
+	$wpdb->query("INSERT INTO $table (IP,variables,useragent,timestamp) VALUES(\"$visitorIP\",\"$postedData\",\"$visitor_user_agent\",\"$visitor_time\")");
+
+
+}
+
+
+
 function load_custom_IPBLC_admin_style()
 {
 
@@ -2009,38 +2105,6 @@ function IPJS()
 
 	$scriptname=$_SERVER['SCRIPT_NAME'];
 	$page=$_GET['page'];
-
-if((strpos($scriptname,"edit-comments.php")>0) || (strpos($scriptname,"admin.php")>0 && ($page=="wp-IPBLC-stats" || $page=="wp-IPBLC" || $page=="wp-IPBLC-Add")) )
-{
-
-?>
-
-<style>
-#IPBLC_message_like
-{
-	position: fixed;
-	bottom: 20px;
-	float: left;
-	left: 5px;
-	border:1px solid #99AA99;
-	background-color: #EFEFEF;
-	font-size: 12px;
-	//font-weight: bold;
-	padding: 4px;
-	color: #000000;
-}
-
-#IPBLC_message_like a
-{
-	color: #222222;
-}
-</style>
-<div id="IPBLC_message_like">
-<a href="http://wordpress.org/extend/plugins/ip-blacklist-cloud/" target="_blank">Rate IP Blacklist Cloud</a>
-</div>
-<?php
-
-}
 
 ?>
 <script type="text/javascript">
