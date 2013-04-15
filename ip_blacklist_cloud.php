@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming.
-Version: 1.9
+Version: 2.0
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -801,6 +801,168 @@ function IPBLC_blockip()
 </center>
 	<?php
 		exit();
+	}
+
+	if($_GET['action']=="getBlacklist")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+			$IPs_in_DP=$wpdb->get_results("SELECT IP FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY id DESC");
+			$IPx=array();
+			$userxx=array();
+			if($IPs_in_DP)
+			{
+				foreach($IPs_in_DP as $this_IP)
+				{
+						$IPx['IP']=$this_IP->IP;
+						$AllData[]=$IPx;
+				}
+			}
+			/*
+			$USERs_in_DP=$wpdb->get_results("SELECT USERNAME FROM ".$wpdb->prefix."IPBLC_usernames ORDER BY id DESC");
+			if($USERs_in_DP)
+			{
+				foreach($USERs_in_DP as $this_USER)
+				{
+					$USERx=$this_USER->USERNAME;
+					$USERx=str_replace("&quot;",'"',$USERx);
+					$USERx=urlencode($USERx);
+					$userxx['username']=$USERx;
+					$AllData[]=$userxx;
+
+				}
+			}
+			*/
+
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			
+	    }
+		$result['DATA']=$AllData;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+
+	exit();
+	}
+
+
+	if($_GET['action']=="addBlacklistIP")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+			
+		$IP=$_GET['IP'];
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+
+		if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+		{
+			$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP=\"$IP\"");
+			if(!$IP_in_DP)
+			{
+				$table=$wpdb->prefix."IPBLC_blacklist";
+				$time=time();
+				$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES(\"$IP\",\"$time\")");				
+					$contextData = array (
+ 			                'method' => 'POST',
+			                'header' => "Connection: close\r\n".
+ 			             "Referer: ".site_url()."\r\n");
+					$context = stream_context_create(array
+					( 'http' => $contextData ));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));					$post_to_cloud =  file_get_contents (
+			                  $link,  // page url
+			                  false,
+			                  $context);
+
+				$AllData[]=array("IP"=>$IP,"added"=>1);
+			}
+			else
+			{
+				$AllData[]=array("IP"=>$IP,"added"=>2);
+			}
+
+		}
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			
+	    }
+		$result['DATA']=$AllData;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+
+	exit();
+	}
+
+
+	if($_GET['action']=="verifyCloudLogin")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+
+		if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    	{
+			$result['verify']=1;
+
+		}//-------passed cloud login-----
+
+		else
+		{
+			$result['verify']=-1;
+		}
+		echo $_GET['callback']."(".json_encode($result).")";
+	
+	exit();
+	}
+
+
+	if($_GET['action']=="failedDetails")
+	{
+		if(current_user_can( 'manage_options' ))
+		{
+			$IP=$_GET['IP'];
+			if(!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+			{
+				echo "Invalid IP";
+				exit();
+			}
+			$manage=1;
+
+			include "failedDetails.php";
+
+		}
+		else
+		{
+			echo "You don't have permission to view details.";
+		}
+	exit();
 	}
 
 
@@ -2054,6 +2216,68 @@ function IPBLC_login_failed(){
 
 	$wpdb->query("INSERT INTO $table (IP,variables,useragent,timestamp) VALUES(\"$visitorIP\",\"$postedData\",\"$visitor_user_agent\",\"$visitor_time\")");
 
+
+
+
+	$IPBLC_failedlogin_max=get_option('IPBLC_failedlogin_max');
+	if(!$IPBLC_failedlogin_max)
+	{
+		update_option('IPBLC_failedlogin_max','5');
+		$IPBLC_failedlogin_max=get_option('IPBLC_failedlogin_max');
+
+	}
+	$IPBLC_failedlogin_time=get_option('IPBLC_failedlogin_time');
+	if(!$IPBLC_failedlogin_time)
+	{
+		update_option('IPBLC_failedlogin_time','60');
+		$IPBLC_failedlogin_time=get_option('IPBLC_failedlogin_time');
+
+	}
+	$IPBLC_failedlogin_email=get_option('IPBLC_failedlogin_email');
+
+	$time=time();
+	$startTime=$time-($IPBLC_failedlogin_time*60);
+
+	$failedTotal=$wpdb->get_results("SELECT COUNT(*) as attempts FROM $table WHERE IP=\"$visitorIP\" AND timestamp>=$startTime AND timestamp<=$time");
+
+
+	if($failedTotal)
+	{
+		$attempts=$failedTotal[0]->attempts;
+		echo $attempts;
+
+		if($attempts>=$IPBLC_failedlogin_max)
+		{
+			$table2=$wpdb->prefix."IPBLC_blacklist";
+			$wpdb->query("INSERT INTO $table2 (IP,timestamp) VALUES('$visitorIP','$time')");
+
+
+
+				$contextData = array ( 
+						'method' => 'POST',
+						'header' => "Connection: close\r\n".
+						"Referer: ".site_url()."\r\n");
+
+				$context = stream_context_create (array ( 'http' => $contextData ));
+
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+
+				$post_to_cloud =  file_get_contents (
+						$link,  // page url
+						false,
+						$context);
+
+				if($IPBLC_failedlogin_email)
+				{
+					$failedMessage="$visitorIP blacklisted on ".site_url()." due to failed login attempts on following condition:\n\nAttempts: $IPBLC_failedlogin_max (max)\nTime for max attempts: $IPBLC_failedlogin_time"."\nTotal attempts made: $attempts"."\n\nThank you for using IP Blacklist Cloud";
+
+					wp_mail($IPBLC_failedlogin_email,"$visitorIP Blacklisted (Failed Login)",$failedMessage);
+				}
+
+		}
+	}
+
+	
 
 }
 

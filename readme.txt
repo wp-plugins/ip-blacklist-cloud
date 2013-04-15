@@ -1,10 +1,10 @@
 === IP Blacklist Cloud ===
 Contributors: ad33lx
 Donate link: 
-Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure
+Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 1.9
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,12 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 2.0 =
+* Failed login table shows each IP one time with number of attempts. Details of each IP are also available on single click.
+* Settings added for auto blacklisting IP for "x" number of failed attempts within given "y" time.
+* Receive email (optional) on auto blacklisting IP based on failed login attempts.
+
 
 = 1.9 =
 * Added "Failed Logins" sub-menu which shows details of IP, user agent and POST query variables.

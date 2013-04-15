@@ -126,8 +126,29 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?em
 
 	}
 
+	if(isset($_POST['update_cloud_connect']))
+	{
+
+		update_option('IPBLC_cloud_on',$_POST['IPBLC_cloud_on']);
+		update_option('IPBLC_cloud_password',$_POST['IPBLC_cloud_password']);
+
+
+		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
+<p><strong>Settings saved.</strong></p></div>";
+
+	}
+
+
+
+	$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
 	
 
+	$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+	if(!$IPBLC_cloud_on)
+	{
+		update_option('IPBLC_cloud_on','1');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+	}
 
 
 
@@ -148,62 +169,38 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?em
 
 	$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
 	$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
-/*
 
-	if($IPBLC_cloud_email && $IPBLC_cloud_key)
+
+
+
+	if(isset($_POST['update_IPBLC_failedlogin']))
 	{
-		//---post blacklist data to ip-finder.me
 
-		$contextData = array ( 
-		'method' => 'POST',
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n"); 
+		update_option('IPBLC_failedlogin_max',$_POST['IPBLC_failedlogin_max']);
+		update_option('IPBLC_failedlogin_time',$_POST['IPBLC_failedlogin_time']);
+		update_option('IPBLC_failedlogin_email',$_POST['IPBLC_failedlogin_email']);
 
-		$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-		$email2=urlencode($IPBLC_cloud_email);
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$IPBLC_cloud_key;
-
-
-		$post_to_cloud =  file_get_contents (
-		$link,
-		false,
-		$context);
-
-		//echo $post_to_cloud;
-
-
-		if($post_to_cloud=="-1")
-		{
-			
-		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
-<p><strong>Invalid email address or cloudkey for Cloud Account.</strong></p></div>";
-
-
-		}
-		elseif($post_to_cloud=="-2")
-		{
-			
-		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
-<p><strong>Your Cloud Account has expired.</strong></p></div>";
-
-
-		}
-		elseif($post_to_cloud)
-		{
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
-<p><strong>Your Cloud Account will expire on ".date("d-m-Y",$post_to_cloud).".</strong></p></div>";
+<p><strong>Settings saved.</strong></p></div>";
 
-
-		}
 	}
 
-*/
 
+	$IPBLC_failedlogin_max=get_option('IPBLC_failedlogin_max');
+	if(!$IPBLC_failedlogin_max)
+	{
+		update_option('IPBLC_failedlogin_max','5');
+		$IPBLC_failedlogin_max=get_option('IPBLC_failedlogin_max');
 
+	}
+	$IPBLC_failedlogin_time=get_option('IPBLC_failedlogin_time');
+	if(!$IPBLC_failedlogin_time)
+	{
+		update_option('IPBLC_failedlogin_time','60');
+		$IPBLC_failedlogin_time=get_option('IPBLC_failedlogin_time');
 
+	}
+	$IPBLC_failedlogin_email=get_option('IPBLC_failedlogin_email');
 
 ?>
 
@@ -245,6 +242,50 @@ $optioni_2="selected";
 <input type="submit" name="update_IPBLC" id="update_IPBLC" value="Save Changes" class="button-primary">
 </td>
 </tr>
+
+</table>
+</form>
+<h3>Failed Login Settings (Auto Blacklist)</h3>
+<form  method="post" ENCTYPE="multipart/form-data">
+<table cellspacing=2 cellpadding=2 class="form-table" style="width: 680px;">
+
+
+<tr valign="top">
+<td>
+Maximum attempts: 
+</td>
+<td>
+<input type="input" name="IPBLC_failedlogin_max" id="IPBLC_failedlogin_max" value="<?php echo $IPBLC_failedlogin_max; ?>" class="regular-text" style="width: 180px;">
+
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+Time limit for maximum attempts (minutes): 
+</td>
+<td>
+<input type="input" name="IPBLC_failedlogin_time" id="IPBLC_failedlogin_time" value="<?php echo $IPBLC_failedlogin_time; ?>" class="regular-text" style="width: 180px;"> Minutes
+
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+Send Email on Auto Block: 
+</td>
+<td>
+<input type="input" name="IPBLC_failedlogin_email" id="IPBLC_failedlogin_email" value="<?php echo $IPBLC_failedlogin_email; ?>" class="regular-text" style="width: 180px;"> <small>(Leave blank if you don't want email.)</small>
+
+</td>
+</tr>
+
+<tr valign="top" valign="top">
+<td colspan=2 height=60>
+<input type="submit" name="update_IPBLC_failedlogin" id="update_IPBLC_failedlogin" value="Save Changes" class="button-primary">
+</td>
+</tr>
+
 
 </table>
 </form>
@@ -556,7 +597,66 @@ function submitToDBUsername(username)
 
 <div id="exportResult" style="font-weight: bold;"></div>
 
+<?php
+/*
+?>
 
+<BR><BR>
+<form method="post" ENCTYPE="multipart/form-data">
+<h3>Cloud Settings</h3>
+<BR><b>Note: If you have purchased IP Cloud Server and it is running, turn on "Connect to Cloud" option and set password for this website.</b><BR>
+
+<table cellspacing=2 cellpadding=2 class="form-table" style="width: 650px;">
+
+
+<tr valign="top">
+<td>
+<b>Connect to cloud:</b> 
+</td>
+<td>
+<select id="IPBLC_cloud_on" name="IPBLC_cloud_on"  style="width: 80px;">
+<?php
+if($IPBLC_cloud_on=="1")
+{
+$option2_1="selected";
+$option2_2="";
+}
+elseif($IPBLC_cloud_on=="2")
+{
+$option2_2="selected";
+$option2_1="";
+}
+
+?>
+
+<option value="1" <?php echo $option2_1; ?>>No</option>
+<option value="2" <?php echo $option2_2; ?>>Yes</option>
+
+</select>
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<b>Set password:</b>
+</td>
+<td>
+<input type="input" name="IPBLC_cloud_password" id="IPBLC_cloud_password" value="<?php echo $IPBLC_cloud_password; ?>" class="regular-text" style="width: 180px;">
+</td>
+</tr>
+
+<tr valign="top" valign="top">
+<td colspan=2 height=60>
+<input type="submit" name="update_cloud_connect" id="update_cloud_connect" value="Save Changes" class="button-primary">
+</td>
+</tr>
+
+</table>
+</form>
+
+<?php
+*/
+?>
 
 <script>
 

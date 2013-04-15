@@ -95,6 +95,8 @@ $order=$_GET['order'];
 $sort1="sortable";
 $sort2="sortable";
 $sort3="sortable";
+$sort4="sortable";
+$sort5="sortable";
 
 
 if(!$order)
@@ -121,6 +123,14 @@ else if($orderby=="IP")
 {
 	$sort3="sorted";
 }
+else if($orderby=="countx")
+{
+	$sort4="sorted";
+}
+else if($orderby=="blc")
+{
+	$sort5="sorted";
+}
 
 
 
@@ -145,9 +155,21 @@ else if($orderby=="IP")
 
 
 
-		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_login_failed ORDER BY $orderby $order");
+		$totalIP = $wpdb->query( "SELECT DISTINCT(IP), id, COUNT(IP) as countx,timestamp FROM ".$wpdb->prefix."IPBLC_login_failed  GROUP BY IP  ORDER BY $orderby $order");
 
-		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_login_failed ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
+/*
+		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx,timestamp, FROM ".$wpdb->prefix."IPBLC_login_failed GROUP BY IP ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
+*/
+		$table1=$wpdb->prefix."IPBLC_login_failed";
+		$table2=$wpdb->prefix."IPBLC_blacklist";
+		$extraSearch=", (SELECT 1 FROM ".$table2." WHERE ".$table2.".IP=".$table1.".IP) as blc ";
+
+
+		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx,timestamp  $extraSearch
+ FROM ".$wpdb->prefix."IPBLC_login_failed GROUP BY IP ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
+
+
+
 
 		//$totalIP=count($totalcomments);
 
@@ -191,7 +213,7 @@ if($pageNum>10)
 
 $xyzz=$pageNum-10;
 
-      $nav .= " <a HREF = \"$self&page_num=$xyzz\">&lt;&lt;</a>-";
+      $nav .= " <a HREF = \"$self&page_num=$xyzz\">&lt;&lt;</a>- &nbsp; ";
 
 }
 
@@ -207,7 +229,7 @@ for($page = 1; $page <= $maxPage; $page++)
 
    {
 
-      $nav .= "<b><font color=red> $page </font></b>"; // no need to create a link to current page
+      $nav .= "<b><font color=red> $page </font></b> &nbsp; "; // no need to create a link to current page
 
    }
 
@@ -225,7 +247,7 @@ for($page = 1; $page <= $maxPage; $page++)
 
 
 
-      $nav .= " <a HREF = \"$self&page_num=$page\">$page</a> ";
+      $nav .= " <a HREF = \"$self&page_num=$page\">$page</a>  &nbsp; ";
 
 		}
 
@@ -235,7 +257,7 @@ for($page = 1; $page <= $maxPage; $page++)
 
 		{
 
-		      $nav .= " <a HREF = \"$self&page_num=$page\">$page</a> ";
+		      $nav .= " <a HREF = \"$self&page_num=$page\">$page</a>  &nbsp; ";
 
 		}
 
@@ -253,7 +275,7 @@ if($pageNum<$maxPage-9)
 
 $xyzzz=$pageNum+10;
 
-      $nav .= "- <a HREF = \"$self&page_num=$xyzzz\">&gt;&gt;</a>";
+      $nav .= "- <a HREF = \"$self&page_num=$xyzzz\">&gt;&gt;</a> &nbsp; ";
 
 }
 
@@ -301,8 +323,11 @@ $xyzzz=$pageNum+10;
 
 		</th>
 
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 150px;">User Agent</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 130px;">Query Vars</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort4; ?> <?php echo $order; ?>'  style="text-align: left; width: 100px;">
+<a href="?page=wp-IPBLC-failed-login&orderby=countx&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>Failed Attempts</span><span class="sorting-indicator"></span>
+</a>
+
 
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 90px;">
 <a href="?page=wp-IPBLC-failed-login&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
@@ -310,8 +335,12 @@ $xyzzz=$pageNum+10;
 </a>
 
 		</th>
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 90px;">Full Details</th>
 
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 90px;">IP Status</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort5; ?> <?php echo $order; ?>'  style="text-align: left; width: 90px;">
+<a href="?page=wp-IPBLC-failed-login&orderby=blc&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>IP Status</span><span class="sorting-indicator"></span>
+</a>
 
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 50px;">Actions</th>
 
@@ -340,15 +369,20 @@ $xyzzz=$pageNum+10;
 
 		</th>
 
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 150px;">User Agent</th>
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 130px;">Query Vars</th>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort4; ?> <?php echo $order; ?>'  style="text-align: left; width: 100px;">
+<a href="?page=wp-IPBLC-failed-login&orderby=countx&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>Failed Attempts</span><span class="sorting-indicator"></span>
+</a>
+
+
 
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 90px;">
 <a href="?page=wp-IPBLC-failed-login&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>Server Time</span><span class="sorting-indicator"></span>
-</a>
+</a>		</th>
 
-		</th>
+
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 90px;">Full Details</th>
 
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 90px;">IP Status</th>
 
@@ -400,14 +434,12 @@ $xyzzz=$pageNum+10;
 <td class="username column-username"><a href="http://ip-finder.me/<?php echo $this_IP->IP; ?>/" title="<?php echo $this_IP->IP; ?>"><?php echo $this_IP->IP; ?></a></td>
 
 <td class="name column-name">
-<?php echo $this_IP->useragent; ?>
+<?php echo $this_IP->countx; ?>
 </td>
 
-<td class="name column-name">
-<?php echo $this_IP->variables; ?>
-</td>
 
 <td class="name column-name"><?php echo date("M d, Y",$this_IP->timestamp); ?></td>
+<td class="name column-name"><a href="<?php echo site_url(); ?>/?action=failedDetails&IP=<?php echo $this_IP->IP; ?>" target=_blank>DETAILS</a></td>
 
 
 <td class="name column-name">
