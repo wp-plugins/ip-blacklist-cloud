@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 2.0
+Stable tag: 2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,9 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 2.1 =
+*Fixes for "Details Page" of failed login IP.
 
 = 2.0 =
 * Failed login table shows each IP one time with number of attempts. Details of each IP are also available on single click.
