@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming.
-Version: 2.1
+Version: 2.2
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -516,12 +516,32 @@ function IPBLC_IP_value( $column, $comment_ID )
 	<span class="edit">
 		<a href="http://ip-finder.me/'.$IP.'/" target="_blank" title="IP Details on IP-Finder.me">IP Details</a>
 	</span> | 
-	<span class="edit">
-		<a href="javascript: blacklist_IP(\''.$IP.'\','.$comment_ID.');" title="Blacklist IP">Blacklist IP</a>
+	<span class="edit">';
+
+	$my_IP=$_SERVER['REMOTE_ADDR'];
+
+		if($my_IP!=$IP)
+		{
+		echo '<a href="javascript: blacklist_IP(\''.$IP.'\','.$comment_ID.');" title="Blacklist IP">Blacklist IP</a>';
+		}
+		else
+		{
+				echo "<b style=\"color:#000099\"> YOUR IP</b>";
+		}
+		echo'
 	</span> | 
 
-	<span class="edit">
-		<a href="javascript: blacklist_USER(\''.urlencode($authorName).'\','.$comment_ID.');" title="Blacklist Username">Blacklist Username</a>
+	<span class="edit">';
+
+
+		if($my_IP!=$IP)
+		{
+		
+		echo '<a href="javascript: blacklist_USER(\''.urlencode($authorName).'\','.$comment_ID.');" title="Blacklist Username">Blacklist Username</a>';
+		}
+		
+
+		echo '
 	</span>
 
 		</div>

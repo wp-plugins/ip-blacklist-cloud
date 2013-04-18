@@ -3,6 +3,9 @@
 
 
 global $wpdb;
+	$my_IP=$_SERVER['REMOTE_ADDR'];
+
+	$IPBLC_failed_sort_status=get_option('IPBLC_failed_sort_status');
 
 
 //---start admin options
@@ -132,6 +135,14 @@ else if($orderby=="blc")
 	$sort5="sorted";
 }
 
+	if(!$IPBLC_failed_sort_status && $orderby=="blc")
+	{
+		$sort5="";
+		$orderby="timestamp";
+		$sort1="sorted";
+
+	}
+
 
 
 
@@ -162,8 +173,18 @@ else if($orderby=="blc")
 */
 		$table1=$wpdb->prefix."IPBLC_login_failed";
 		$table2=$wpdb->prefix."IPBLC_blacklist";
+
+		if($IPBLC_failed_sort_status=="1")
+		{
+
 		$extraSearch=", (SELECT 1 FROM ".$table2." WHERE ".$table2.".IP=".$table1.".IP) as blc ";
 
+		}
+		else
+		{
+			$extraSearch="";
+
+		}
 
 		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx,timestamp  $extraSearch
  FROM ".$wpdb->prefix."IPBLC_login_failed GROUP BY IP ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
@@ -328,7 +349,6 @@ $xyzzz=$pageNum+10;
 <span>Failed Attempts</span><span class="sorting-indicator"></span>
 </a>
 
-
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 90px;">
 <a href="?page=wp-IPBLC-failed-login&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>Server Time</span><span class="sorting-indicator"></span>
@@ -337,10 +357,29 @@ $xyzzz=$pageNum+10;
 		</th>
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 90px;">Full Details</th>
 
+<?php
+		if($IPBLC_failed_sort_status=="1")
+		{
+?>
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort5; ?> <?php echo $order; ?>'  style="text-align: left; width: 90px;">
 <a href="?page=wp-IPBLC-failed-login&orderby=blc&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>IP Status</span><span class="sorting-indicator"></span>
 </a>
+
+<?php
+		}
+		else
+		{
+
+?>
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 100px;">IP Status</th>
+
+<?php
+		}
+
+?>
+
+
 
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 50px;">Actions</th>
 
@@ -374,17 +413,37 @@ $xyzzz=$pageNum+10;
 <span>Failed Attempts</span><span class="sorting-indicator"></span>
 </a>
 
-
-
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 90px;">
 <a href="?page=wp-IPBLC-failed-login&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
 <span>Server Time</span><span class="sorting-indicator"></span>
-</a>		</th>
+</a>
 
-
+		</th>
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 90px;">Full Details</th>
 
-		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 90px;">IP Status</th>
+<?php
+		if($IPBLC_failed_sort_status=="1")
+		{
+?>
+		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort5; ?> <?php echo $order; ?>'  style="text-align: left; width: 90px;">
+<a href="?page=wp-IPBLC-failed-login&orderby=blc&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
+<span>IP Status</span><span class="sorting-indicator"></span>
+</a>
+
+<?php
+		}
+		else
+		{
+
+?>
+		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 100px;">IP Status</th>
+
+<?php
+		}
+
+?>
+
+
 
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 50px;">Actions</th>
 
@@ -447,17 +506,15 @@ $xyzzz=$pageNum+10;
 		$IP=$this_IP->IP;
 		$failedID=$this_IP->id;
 
-		$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
-
-		if($IP_in_DP)
-		{
-			echo "<span id=\"IPBlack"."$failedID\"><b style=\"color:#FF0000\"> Blacklisted</b></span><BR>";
-		}
-		else
-		{
-			echo "<span id=\"IPBlack"."$failedID\"><b style=\"color:#009900\"> Neutral</b></span><BR>";
-		}
-
+			$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
+			if($IP_in_DP)
+			{
+				echo "<span id=\"IPBlack"."$failedID\"><b style=\"color:#FF0000\"> Blacklisted</b></span><BR>";
+			}
+			else
+			{
+				echo "<span id=\"IPBlack"."$failedID\"><b style=\"color:#009900\"> Neutral</b></span><BR>";
+			}
 
 ?>
 
@@ -467,8 +524,15 @@ $xyzzz=$pageNum+10;
 
 <?php 
 
-	echo '<a href="javascript: blacklist_IP(\''.$IP.'\','.$failedID.');" title="Blacklist IP">Blacklist IP</a>';
+		if($my_IP!=$IP)
+		{
 
+			echo '<a href="javascript: blacklist_IP(\''.$IP.'\','.$failedID.');" title="Blacklist IP">Blacklist IP</a>';
+		}
+		else
+		{
+				echo "<b style=\"color:#000099\"> YOUR IP</b>";
+		}
 ?>
 </td>
 

@@ -35,6 +35,7 @@ global $wpdb;
 
 		update_option('IPBLC_auto_comments',$_POST['auto_comments']);
 		update_option('IPBLC_protected',$_POST['IPBLC_protected']);
+		update_option('IPBLC_failed_sort_status',$_POST['IPBLC_failed_sort_status']);
 
 
 
@@ -138,9 +139,11 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?em
 
 	}
 
+	$IPBLC_failed_sort_status=get_option('IPBLC_failed_sort_status');
 
 
 	$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+
 	
 
 	$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
@@ -237,14 +240,45 @@ $optioni_2="selected";
 </td>
 </tr>
 
+
+<tr valign="top">
+<td>
+<b>Allow "Sort by IP status" in failed login page:</b> 
+</td>
+<td>
+<select id="IPBLC_failed_sort_status" name="IPBLC_failed_sort_status"  style="width: 80px;">
+<?php
+if($IPBLC_failed_sort_status=="")
+{
+$optioni1_1="selected";
+}
+elseif($IPBLC_failed_sort_status=="1")
+{
+$optioni1_2="selected";
+}
+
+?>
+
+<option value="" <?php echo $optioni1_1; ?>>No</option>
+<option value="1" <?php echo $optioni1_2; ?>>Yes</option>
+
+</select>
+</td>
+</tr>
+
+
+
 <tr valign="top" valign="top">
 <td colspan=2 height=60>
 <input type="submit" name="update_IPBLC" id="update_IPBLC" value="Save Changes" class="button-primary">
 </td>
 </tr>
-
 </table>
 </form>
+<b style="color: #FF0000;">NOTE: If <i style="color: #000099;">Allow "Sort by IP status" in failed login page</i> is set to YES and does not show any data in "Failed Login" page, please set this option to NO.</b><BR>
+
+
+
 <h3>Failed Login Settings (Auto Blacklist)</h3>
 <form  method="post" ENCTYPE="multipart/form-data">
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 680px;">
@@ -600,6 +634,7 @@ function submitToDBUsername(username)
 <?php
 /*
 ?>
+
 
 <BR><BR>
 <form method="post" ENCTYPE="multipart/form-data">
