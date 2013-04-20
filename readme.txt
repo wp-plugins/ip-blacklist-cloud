@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 2.2
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,14 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 2.3 =
+* Throws 404 Response to blacklisted IP addresses.
+* Search option added for blacklisted IP addresses.
+* Delete Multiple blacklisted IP addresses by check/uncheck all option.
+* EXTRA SECURITY menu added.
+
+
 = 2.2 =
 * Settings to allow "Sort by IP status" in failed login page. By setting it to yes, you can sort Failed Login by IP Status (Neutral/Blacklisted).
 

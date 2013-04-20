@@ -186,7 +186,7 @@ else if($orderby=="blc")
 
 		}
 
-		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx,timestamp  $extraSearch
+		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx, timestamp  $extraSearch
  FROM ".$wpdb->prefix."IPBLC_login_failed GROUP BY IP ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
 
 

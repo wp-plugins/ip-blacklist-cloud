@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming.
-Version: 2.2
+Version: 2.3
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -380,6 +380,7 @@ function page_IPBLC_actions()
 	}
 	add_submenu_page( "wp-IPBLC", "Blacklist Statistics", "Blacklist Statistics", "manage_options", "wp-IPBLC-stats", "blacklist_stats" );
 
+	add_submenu_page( "wp-IPBLC", "EXTRA SECURITY", "EXTRA SECURITY", "manage_options", "wp-IPBLC-extra", "blacklist_extra" );
 	add_submenu_page( "wp-IPBLC", "Support", "Support", "manage_options", "wp-IPBLC-support", "blacklist_support" );
 
 
@@ -436,6 +437,11 @@ function blacklist_premium()
 function blacklist_support()
 {
 	include "blacklist-support.php";
+}
+
+function blacklist_extra()
+{
+	include "blacklist-extra.php";
 }
 
 
@@ -747,6 +753,8 @@ function IPBLC_blockip()
 		$wpdb->query("UPDATE ".$wpdb->prefix."IPBLC_blacklist SET `visits`=\"$visits\" WHERE id=\"$IP_in_DP\"");
 		
 
+//show 404 error
+header("Status: 404 Not Found");
 
 	?>
 
@@ -800,6 +808,10 @@ function IPBLC_blockip()
 		$visits=$visits+1;
 		$wpdb->query("UPDATE ".$wpdb->prefix."IPBLC_usernames SET `visits`=\"$visits\" WHERE id=\"$USER_in_DP\"");
 
+//show 404 error
+header("Status: 404 Not Found");
+
+
 	?>
 
 <head><title><?php echo get_bloginfo('name'); ?></title></head>
@@ -822,6 +834,351 @@ function IPBLC_blockip()
 	<?php
 		exit();
 	}
+
+	if($_GET['action']=="getFailedPagination")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+
+//-----------------------------------------SETTINGS----------------------------------------
+//--Posts per page
+$rowsPerPage = 30;
+// by default we show first page
+$pageNum = 1;
+// if $_GET['page'] defined, use it as page number
+if(isset($_GET['page_num']))
+{
+    $pageNum = $_GET['page_num'];
+}
+// counting the offset
+	$offset = ($pageNum - 1) * $rowsPerPage;
+	$page_num=$pageNum;
+//---------------------------------------------------------------------------------
+
+		$totalIP = $wpdb->query( "SELECT DISTINCT(IP), id, COUNT(IP) as countx,timestamp FROM ".$wpdb->prefix."IPBLC_login_failed  GROUP BY IP  ORDER BY  timestamp DESC");
+
+		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx, timestamp  
+ FROM ".$wpdb->prefix."IPBLC_login_failed GROUP BY IP ORDER BY timestamp DESC LIMIT $offset, $rowsPerPage");
+
+	$self="javascript: ";
+		$maxPage = ceil($totalIP/$rowsPerPage);
+
+$nav  = "<BR>Page: ";
+// ... the previous code
+if($pageNum>10)
+{
+	$xyzz=$pageNum-10;
+      $nav .= " <a HREF = \"$self getFailedData($xyzz); getFailedPagination($xyzz); \">&lt;&lt;</a>- &nbsp; ";
+}
+
+for($page = 1; $page <= $maxPage; $page++)
+{
+
+   if ($page == $pageNum)
+   {
+      $nav .= "<b><font color=red> $page </font></b> &nbsp; "; // no need to create a link to current page
+   }
+   else
+   {
+
+		if($page<$pageNum & $page>$pageNum-10)
+		{
+      $nav .= " <a HREF = \"$self getFailedData($page); getFailedPagination($page); \">$page</a>  &nbsp; ";
+		}
+
+		else if($page>$pageNum & $page<$pageNum+10)
+		{
+		      $nav .= " <a HREF = \"$self getFailedData($page); getFailedPagination($page); \">$page</a>  &nbsp; ";
+		}
+   } 
+}
+if($pageNum<$maxPage-9)
+{
+
+	$xyzzz=$pageNum+10;
+      $nav .= "- <a HREF = \"$self getFailedData($xyzz); getFailedPagination($xyzz); \">&gt;&gt;</a> &nbsp; ";
+}
+		$nav  .= '<BR>';
+
+
+
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			
+	    }
+		$result['PAGINATION']=$nav;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+
+	exit();
+	}
+
+
+	if($_GET['action']=="getIPStatusJSON")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+			$IP=$_GET['IP'];
+			if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+			{
+
+			$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP=\"$IP\"");
+			if($IP_in_DP)
+			{
+				$status="<b style=\"color:#FF0000\"> Blacklisted</b>";
+			}
+			else
+			{
+				$status="<b style=\"color:#009900\"> Neutral</b>";
+			}
+			
+			}
+			else
+			{
+				$status="<font color=red><b>X</b></font>";
+			}
+
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			
+	    }
+		$result['STATUS']=$status;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+
+	exit();
+	}
+
+
+
+
+	if($_GET['action']=="getFailedPaginationSingle")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+
+			$IP=$_GET['IP'];
+			if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+			{
+//-----------------------------------------SETTINGS----------------------------------------
+//--Posts per page
+$rowsPerPage = 30;
+// by default we show first page
+$pageNum = 1;
+// if $_GET['page'] defined, use it as page number
+if(isset($_GET['page_num']))
+{
+    $pageNum = $_GET['page_num'];
+}
+// counting the offset
+	$offset = ($pageNum - 1) * $rowsPerPage;
+	$page_num=$pageNum;
+//---------------------------------------------------------------------------------
+
+		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_login_failed WHERE IP=\"$IP\" GROUP BY IP  ORDER BY  timestamp DESC");
+
+		$resultX = $wpdb->get_results( "SELECT *  FROM ".$wpdb->prefix."IPBLC_login_failed WHERE IP=\"$IP\" GROUP BY IP ORDER BY timestamp DESC LIMIT $offset, $rowsPerPage");
+
+	$self="javascript: ";
+		$maxPage = ceil($totalIP/$rowsPerPage);
+
+$nav  = "<BR>Page: ";
+// ... the previous code
+if($pageNum>10)
+{
+	$xyzz=$pageNum-10;
+      $nav .= " <a HREF = \"$self getFailedIPSingleWeb('$IP', $xyzz); \">&lt;&lt;</a>- &nbsp; ";
+}
+
+for($page = 1; $page <= $maxPage; $page++)
+{
+
+   if ($page == $pageNum)
+   {
+      $nav .= "<b><font color=red> $page </font></b> &nbsp; "; // no need to create a link to current page
+   }
+   else
+   {
+
+		if($page<$pageNum & $page>$pageNum-10)
+		{
+      $nav .= " <a HREF = \"$self  getFailedIPSingleWeb('$IP',$page);\">$page</a>  &nbsp; ";
+		}
+
+		else if($page>$pageNum & $page<$pageNum+10)
+		{
+		      $nav .= " <a HREF = \"$self  getFailedIPSingleWeb('$IP',$page); \">$page</a>  &nbsp; ";
+		}
+   } 
+}
+if($pageNum<$maxPage-9)
+{
+
+	$xyzzz=$pageNum+10;
+      $nav .= "- <a HREF = \"$self  getFailedIPSingleWeb('$IP',$xyzz); \">&gt;&gt;</a> &nbsp; ";
+}
+		$nav  .= '<BR>';
+
+
+if($resultX)
+{
+
+	foreach($resultX as $this_IP)
+	{
+
+		$userAgent=$this_IP->useragent;
+		$vars=$this_IP->variables;
+		$idd=$this_IP->id;
+		$timeX=date("M d, Y",$this_IP->timestamp);
+
+		$AllData[]=array("userAgent"=>$userAgent,"variables"=>$vars,"login_id"=>$idd,"date"=>$timeX);
+	}
+}
+
+
+
+		}
+		else
+		{
+			$nav="";
+
+		}
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			
+	    }
+		$result['PAGINATION']=$nav;
+		$result['DATA']=$AllData;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+
+	exit();
+	}
+
+
+
+
+
+
+	if($_GET['action']=="getFailedData")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+
+//-----------------------------------------SETTINGS----------------------------------------
+//--Posts per page
+$rowsPerPage = 30;
+// by default we show first page
+$pageNum = 1;
+// if $_GET['page'] defined, use it as page number
+if(isset($_GET['page_num']))
+{
+    $pageNum = $_GET['page_num'];
+}
+// counting the offset
+	$offset = ($pageNum - 1) * $rowsPerPage;
+	$page_num=$pageNum;
+//---------------------------------------------------------------------------------
+
+		$totalIP = $wpdb->query( "SELECT DISTINCT(IP), id, COUNT(IP) as countx,timestamp FROM ".$wpdb->prefix."IPBLC_login_failed  GROUP BY IP  ORDER BY  timestamp DESC");
+
+		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx, timestamp  
+ FROM ".$wpdb->prefix."IPBLC_login_failed GROUP BY IP ORDER BY timestamp DESC LIMIT $offset, $rowsPerPage");
+
+
+		if($resultX)
+		{
+			foreach($resultX as $IPData)
+			{
+				$IP=$IPData->IP;
+				$count=$IPData->countx;
+				$timestamp=$IPData->timestamp;
+				$date=date("M d, Y",$timestamp);
+				$link="<a href=\"http://ip-finder.me/$IP\" target=_blank>$IP</a>";
+				$failedID=$IPData->id;
+
+
+			$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
+			if($IP_in_DP)
+			{
+				$IP_status="Website: <span id=\"IPBlack_web_"."$failedID\"><b style=\"color:#FF0000\"> Blacklisted</b></span><BR>";
+			}
+			else
+			{
+				$IP_status="Website: <span id=\"IPBlack_web_"."$failedID\"><b style=\"color:#009900\"> Neutral</b></span><BR>";
+			}
+
+				$status_id="IPBlack_web_"."$failedID";
+
+				$AllData[]=array("IP"=>$IP,"count"=>$count,"date"=>$date,"link"=>$link,"status_web"=>$IP_status,"id"=>$failedID,"status_id"=>$status_id);
+
+			}
+
+		}
+
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			
+	    }
+		$result['DATA']=$AllData;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+
+	exit();
+	}
+
 
 	if($_GET['action']=="getBlacklist")
 	{
