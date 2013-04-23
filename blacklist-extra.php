@@ -118,7 +118,7 @@ Script consist of two files.<BR>
 <i style="color: #0000FF; "><b>checkIP.php</b></i> checks visitor IP in file <i style="color: #0000FF; "><b>blacklistedIP.txt</b></i> and if it is blacklisted, it shows message from <i style="color: #0000FF; "><b>customMessage.php</b></i> and does not allow WordPress to run.<BR>
 <BR>
 
-<BR>You can purchase this script for <b>U.S $5.0</b> but you must have <a href="https://www.moneybookers.com/app/" target=_blank>Skrill (moneybookers)</a> account. Please contact me first at: <b>contact@adiie9.com</b> 
+<BR>You can purchase this script for <b>U.S $5.0</b> from <a href="http://www.freelancer.com/marketplace/product/Simple-PHP-IP-Blacklist-Script.html"><b>Freelancer.com</b></a> or if you have <a href="https://www.moneybookers.com/app/" target=_blank>Skrill (moneybookers)</a> account. Please contact me first at: <b>contact@adiie9.com</b> 
 
 
 <h3>Script Setup</h3>

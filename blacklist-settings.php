@@ -630,13 +630,12 @@ function submitToDBUsername(username)
 <BR><BR>
 
 <div id="exportResult" style="font-weight: bold;"></div>
-
-<BR>
-
 <?php
 /*
+
 ?>
 
+<BR>
 <form method="post" ENCTYPE="multipart/form-data">
 <h3>Cloud Settings</h3>
 <BR><b>Note: If you have purchased IP Cloud Server and it is running, turn on "Connect to Cloud" option and set password for this website.</b><BR>

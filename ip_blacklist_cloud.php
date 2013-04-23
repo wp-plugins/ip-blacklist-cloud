@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming.
-Version: 2.3
+Version: 2.4
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -1095,6 +1095,164 @@ if($resultX)
 	}
 
 
+
+
+
+
+
+
+
+
+	if($_GET['action']=="getPendingComments")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+
+//-----------------------------------------SETTINGS----------------------------------------
+//--Posts per page
+$rowsPerPage = 30;
+// by default we show first page
+$pageNum = 1;
+// if $_GET['page'] defined, use it as page number
+if(isset($_GET['page_num']))
+{
+    $pageNum = $_GET['page_num'];
+}
+// counting the offset
+	$offset = ($pageNum - 1) * $rowsPerPage;
+	$page_num=$pageNum;
+//---------------------------------------------------------------------------------
+		$commentArgsTotal=array("status"=>"hold");
+		$commentArgsCurrent=array("status"=>"hold","offset"=>$offset);
+		$nav="";
+
+
+		$totalComments = get_comments($commentArgsTotal);
+
+		$endComment=($offset+$rowsPerPage)-1;
+		
+		$resultX=array();
+
+			$start1 = 0;
+			$end=$endComment;
+		
+		if($totalComments)
+		{
+			//echo "start: $start1, end: $end\n\n";
+			foreach($totalComments as $cc)
+			{
+				if($start1>=$offset && $start1<=$end)
+				{
+
+					$resultX[]=$cc;
+				}
+				$start1++;
+			}
+
+		}		
+
+		if($resultX)
+		{
+			foreach($resultX as $sComment)
+			{
+				$cData=array();
+				foreach($sComment as $k=>$v)
+				{
+				
+					$cData[$k]=$v;
+					if($k=="comment_author_IP")
+					{
+
+					$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP=\"$v\"");
+					if($IP_in_DP)
+					{
+						$status="<b style=\"color:#FF0000\"> Blacklisted</b>";
+					}
+					else
+					{
+						$status="<b style=\"color:#009900\"> Neutral</b>";
+					}
+					$cData['IP_status']=$status;
+
+
+					}
+				}
+				$AllData[]=$cData;
+			}
+
+		}
+
+		//print_r($AllData);
+
+	$self="javascript: ";
+		$maxPage = ceil(count($totalComments)/$rowsPerPage);
+
+
+
+$nav  = "<BR>Page: ";
+// ... the previous code
+if($pageNum>10)
+{
+	$xyzz=$pageNum-10;
+      $nav .= " <a HREF = \"$self getPendingCommentsSingle( $xyzz); \">&lt;&lt;</a>- &nbsp; ";
+}
+
+for($page = 1; $page <= $maxPage; $page++)
+{
+
+   if ($page == $pageNum)
+   {
+      $nav .= "<b><font color=red> $page </font></b> &nbsp; "; // no need to create a link to current page
+   }
+   else
+   {
+
+		if($page<$pageNum & $page>$pageNum-10)
+		{
+      $nav .= " <a HREF = \"$self  getPendingCommentsSingle($page);\">$page</a>  &nbsp; ";
+		}
+
+		else if($page>$pageNum & $page<$pageNum+10)
+		{
+		      $nav .= " <a HREF = \"$self  getPendingCommentsSingle($page); \">$page</a>  &nbsp; ";
+		}
+   } 
+}
+if($pageNum<$maxPage-9)
+{
+
+	$xyzzz=$pageNum+10;
+      $nav .= "- <a HREF = \"$self  getPendingCommentsSingle($xyzz); \">&gt;&gt;</a> &nbsp; ";
+}
+		$nav  .= '<BR>';
+
+
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			$nav="";
+			$AllData=array();
+
+			
+	    }
+		$result['DATA']=$AllData;
+		$result['PAGINATION']=$nav;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+	exit();
+	}
 
 
 
@@ -2621,7 +2779,7 @@ function IPBLC_login_failed(){
 	if($failedTotal)
 	{
 		$attempts=$failedTotal[0]->attempts;
-		echo $attempts;
+		//echo $attempts;
 
 		if($attempts>=$IPBLC_failedlogin_max)
 		{
