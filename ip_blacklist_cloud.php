@@ -2,8 +2,8 @@
 /*
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
-Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming.
-Version: 2.4
+Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
+Version: 2.5
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -58,7 +58,7 @@ function ip_added()
 		$context = stream_context_create (array ( 'http' => $contextData ));
 
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 		$post_to_cloud =  file_get_contents (
 		$link,
@@ -146,7 +146,7 @@ function user_added()
 
 		$USER2=urlencode($USER);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=$USER2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 		$post_to_cloud =  file_get_contents (
 		$link,
@@ -379,6 +379,7 @@ function page_IPBLC_actions()
 	add_submenu_page( "wp-IPBLC", "Failed Login", "Failed Login", "manage_options", "wp-IPBLC-failed-login", "blacklist_failed_login" );
 	}
 	add_submenu_page( "wp-IPBLC", "Blacklist Statistics", "Blacklist Statistics", "manage_options", "wp-IPBLC-stats", "blacklist_stats" );
+	add_submenu_page( "wp-IPBLC", "Whitelist", "Whitelist", "manage_options", "wp-IPBLC-whitelist", "blacklist_whitelist" );
 
 	add_submenu_page( "wp-IPBLC", "EXTRA SECURITY", "EXTRA SECURITY", "manage_options", "wp-IPBLC-extra", "blacklist_extra" );
 	add_submenu_page( "wp-IPBLC", "Support", "Support", "manage_options", "wp-IPBLC-support", "blacklist_support" );
@@ -469,6 +470,11 @@ function blacklist_add()
 function blacklist_add_user()
 {
 	include "blacklist-add-user.php";
+}
+
+function blacklist_whitelist()
+{
+	include "whitelist.php";
 }
 
 function blacklist_stats()
@@ -966,6 +972,8 @@ if($pageNum<$maxPage-9)
 	    else
 	    {
 			$result['verify']="-1";
+			$status="";
+
 			
 	    }
 		$result['STATUS']=$status;
@@ -1167,6 +1175,8 @@ if(isset($_GET['page_num']))
 			foreach($resultX as $sComment)
 			{
 				$cData=array();
+				$comment_content="";
+
 				foreach($sComment as $k=>$v)
 				{
 				
@@ -1187,7 +1197,14 @@ if(isset($_GET['page_num']))
 
 
 					}
+
+						if($k=="comment_ID")
+						{
+							$comment_content= get_comment_excerpt($v);
+						}
 				}
+				$cData['comment_content']=$comment_content;
+
 				$AllData[]=$cData;
 			}
 
@@ -1425,7 +1442,7 @@ if(isset($_GET['page_num']))
  			             "Referer: ".site_url()."\r\n");
 					$context = stream_context_create(array
 					( 'http' => $contextData ));
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));					$post_to_cloud =  file_get_contents (
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));					$post_to_cloud =  file_get_contents (
 			                  $link,  // page url
 			                  false,
 			                  $context);
@@ -1552,7 +1569,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&w
 
 		$USER2=urlencode($USER);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=$USER2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 		$post_to_cloud =  file_get_contents (
 		$link,
@@ -1605,9 +1622,12 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USE
 		{
 
 			$IP=$_POST['blacklist'];
+			$isIPSafe=isIpSafe($IP);
 
 			if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
 			{
+			    if($isIPSafe==0)
+			    {
 
 				$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
 				$found=false;
@@ -1636,7 +1656,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USE
 
 
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 $post_to_cloud =  file_get_contents (
 
@@ -1661,6 +1681,11 @@ $post_to_cloud =  file_get_contents (
 				{
 					echo "<b style=\"color: #009900;\"> Neutral</b>";
 				}
+			    }
+			    else
+			    {
+					echo "<b style=\"color: #CC0099;\"> Whitelist</b>";
+			    }
 					
 			}
 
@@ -1762,7 +1787,7 @@ $post_to_cloud =  file_get_contents (
 			if (($handle = fopen("$filename", "r")) !== FALSE)
 			{
 				$AllData=array();
-				while (($data = fgetcsv($handle, 100000000, ",")) !== FALSE)
+				while (($data = fgetcsv($handle, 5242880, ",")) !== FALSE)
 				{
 
 					$field=$data[0];
@@ -2161,7 +2186,7 @@ $post_to_cloud =  file_get_contents (
 						$context = stream_context_create (array ( 'http' => $contextData ));
 
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 						$post_to_cloud =  file_get_contents (
 						$link,
@@ -2254,7 +2279,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&w
 
 						$USER2=urlencode($USER);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=$USER2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 						$post_to_cloud =  file_get_contents (
 						$link,
@@ -2357,7 +2382,7 @@ $context = stream_context_create (array ( 'http' => $contextData ));
 
  // Read page rendered as result of your POST request
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 $post_to_cloud =  file_get_contents (
                   $link,  // page url
@@ -2425,7 +2450,7 @@ $post_to_cloud =  file_get_contents (
 
 		$USER2=urlencode($USER);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=$USER2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 		$post_to_cloud =  file_get_contents (
 		$link,
@@ -2738,6 +2763,13 @@ function IPBLC_login_failed(){
 	$visitor_time=$_SERVER['REQUEST_TIME'];
 	$visitor_user_agent=$_SERVER['HTTP_USER_AGENT'];
 
+
+
+	$isIPSafe=isIpSafe($visitorIP);
+
+
+    if($isIPSafe==0)
+    {
 	if($_POST)
 	{
 		foreach($_POST as $k=>$v)
@@ -2795,7 +2827,7 @@ function IPBLC_login_failed(){
 
 				$context = stream_context_create (array ( 'http' => $contextData ));
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 				$post_to_cloud =  file_get_contents (
 						$link,  // page url
@@ -2812,7 +2844,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=$IP&w
 		}
 	}
 
-	
+    }	//$isIPSafe==0	
 
 }
 
@@ -3134,9 +3166,43 @@ function blacklist_USER(USER,commentID)
 </script>
 
 <?php
-
-
-
 }
 
+
+function isIpSafe($checkIP)
+{
+
+	$isIPSafe1=0;
+	$IPBLC_whitelist=get_option('IPBLC_whitelist');
+
+	if($IPBLC_whitelist)
+	{
+		$IPBLC_whitelist_explode=explode("\n",$IPBLC_whitelist);
+
+
+		foreach($IPBLC_whitelist_explode as $wIP)
+		{
+			$wIP=str_replace("\n","",$wIP);
+			$wIP=str_replace(" ","",$wIP);
+			$wIP_explode=explode(".",$wIP);
+			
+			$wIP2=intval($wIP_explode[0]).".".intval($wIP_explode[1]).".".intval($wIP_explode[2]).".".intval($wIP_explode[3]);
+
+			//echo "$visitorIP==$wIP2 -- ".ip2long($visitorIP)." -- ".ip2long($wIP2)."<BR>";
+
+			//echo "OK: ".filter_var($wIP2, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)."<BR>";
+
+			if(ip2long($checkIP)==ip2long($wIP2))
+			{
+				//echo "SAFE";
+				$isIPSafe1=1;
+			}
+		}
+	}
+
+
+
+	return $isIPSafe1;
+
+}
 ?>

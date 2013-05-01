@@ -4,13 +4,13 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 2.4
+Stable tag: 2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 
 
-Blacklist IP Addresses from visiting your WordPress website and Usernames from spamming!!
+Blacklist IP Addresses from visiting your WordPress website and Usernames from spamming.  View details of all failed login attempts.
 
 
 == Description ==
@@ -91,6 +91,12 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
+= 2.5 =
+* Shows details of Failed login attempts for single IP if attempts are less than or equals to 3. For 4 or above attempts, view details on each IP on separate page.
+* Check / Uncheck All failed login attempts and blacklist multiple IPs with one click.
+* Whitelist menu added for those who blacklist themselves by mistake. 
+
+
 = 2.4 =
 * Fixed "Warning: Cannot modify header information - headers already sent by...." error.
 
@@ -99,6 +105,8 @@ http://demo.ip-finder.me/demo-details/
 * Search option added for blacklisted IP addresses.
 * Delete Multiple blacklisted IP addresses by check/uncheck all option.
 * EXTRA SECURITY menu added.
+
+
 
 
 = 2.2 =

@@ -1,0 +1,30 @@
+In your next update you might want to see if you can add a way for users to "select all" on the Failed Login attempts results page to "Blacklist IP". Otherwise I have to go in and click "Backlist IP" for each and every one of these 400 IP's.
+I'm a tier 2 tech support geek for a web hosting company by the way so I do know about web development and testing etc. so I just though this would be something super helpful. What do you think?
+
+***DONE***
+
+-------------
+
+
+White list IP
+
+**DONE**
+
+-------- 
+Single Failed login details-> new popup.
+**Done**
+
+--------
+
+hahaha Well, I have added this combine failed login function because other users said so because in their case, same IPs were attacking website more than 100 times a day. What I can do is, for less than 3 attempts, it will show all 3 attempts details and for 4 or above, there will be link for "full details" 
+
+**DONE**
+--------
+
+
+
+
+
+
+
+

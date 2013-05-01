@@ -318,10 +318,64 @@ $xyzzz=$pageNum+10;
 ?>
 
 
+		<button name="select_all2" id="select_all2" class="button"  onClick="checkAll_IP2(1);">Check All</button> 
+		<button name="unselect_all2" id="unselect_all2" class="button"  onClick="checkAll_IP2(0);">Uncheck All</button> 
+		<button name="bIP_all2" id="bIP_all" class="button">Blacklist</button> 
+
+<script>
+function checkAll_IP2(flag)
+{
+	if(flag==0)
+	{
+		 jQuery("#FailedIPTable INPUT[type='checkbox']").attr('checked',false);
+	}
+	else 
+	{
+		 jQuery("#FailedIPTable INPUT[type='checkbox']").attr('checked',true);
+	}
+
+}
+	var selectedIPs=new Array();
 
 
+jQuery("#bIP_all").click(function(){
 
-<table cellspacing=1 cellpadding=1  class="wp-list-table widefat users">
+	selectedIPs=[];
+
+	jQuery("#FailedIPTable INPUT[type='checkbox']:checked").each(function(){
+
+	selectedIPs.push(jQuery(this).attr('title'));
+
+});
+
+var domainname="";
+
+
+	if(!selectedIPs.length)
+	{
+		alert("Please select IP addresses.");
+
+
+	}
+	else
+	{
+		var bIPN="";
+		for(i in selectedIPs)
+		{
+			bIPN="bIP_"+selectedIPs[i];
+			document.getElementById(bIPN).click();
+
+		}
+
+	}
+	return false;
+
+});
+
+
+</script>
+
+<table cellspacing=1 cellpadding=1  class="wp-list-table widefat users" id="FailedIPTable">
 
 
 
@@ -330,6 +384,7 @@ $xyzzz=$pageNum+10;
 	<thead>
 
 	<tr>
+		<th style="width: 20px;">Sel</th>
 
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort2; ?> <?php echo $order; ?>'  style="text-align: left; width: 50px;">
 <a href="?page=wp-IPBLC-failed-login&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
@@ -394,6 +449,7 @@ $xyzzz=$pageNum+10;
 	<tfoot>
 
 	<tr>
+		<th style="width: 20px;">Sel</th>
 
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort2; ?> <?php echo $order; ?>'  style="text-align: left; width: 50px;">
 <a href="?page=wp-IPBLC-failed-login&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>">
@@ -486,7 +542,13 @@ $xyzzz=$pageNum+10;
 
 
 
-	<tr id='user-<?php echo $this_IP->id; ?>' class="alternate"><td class="username column-id"><?php echo $this_IP->id; ?></td>
+	<tr id='user-<?php echo $this_IP->id; ?>' class="alternate">
+<td style="width: 20px;">
+<input type="checkbox" class="blacklistedFailedCheck" name="blacklistedFailedCheck['<?php echo $this_IP->IP; ?>']" value="<?php echo $this_IP->IP; ?>" title="<?php echo $this_IP->IP; ?>">
+
+
+</td>
+<td class="username column-id"><?php echo $this_IP->id; ?></td>
 
 
 
@@ -498,7 +560,43 @@ $xyzzz=$pageNum+10;
 
 
 <td class="name column-name"><?php echo date("M d, Y",$this_IP->timestamp); ?></td>
+
+
+<?php
+
+	if($this_IP->countx>=4)
+	{
+?>
+
 <td class="name column-name"><a href="<?php echo site_url(); ?>/?action=failedDetails&IP=<?php echo $this_IP->IP; ?>" target=_blank>DETAILS</a></td>
+
+<?php
+	}
+	else
+	{
+
+?>
+<td class="name column-name">
+	<?php
+		$ippXX=$this_IP->IP;
+		$singleDetails = $wpdb->get_results( "SELECT variables FROM ".$wpdb->prefix."IPBLC_login_failed WHERE IP=\"$ippXX\" ORDER BY timestamp DESC");
+		if($singleDetails)
+		{
+
+			foreach($singleDetails as $dd)
+			{
+				echo $dd->variables."---------------------------<BR>";
+			}
+		}
+
+
+	?>
+
+</td>
+<?php
+	}
+
+?>
 
 
 <td class="name column-name">
@@ -527,7 +625,7 @@ $xyzzz=$pageNum+10;
 		if($my_IP!=$IP)
 		{
 
-			echo '<a href="javascript: blacklist_IP(\''.$IP.'\','.$failedID.');" title="Blacklist IP">Blacklist IP</a>';
+			echo '<a href="javascript: blacklist_IP(\''.$IP.'\','.$failedID.');" title="Blacklist IP" id="bIP_'.$IP.'">Blacklist IP</a>';
 		}
 		else
 		{
