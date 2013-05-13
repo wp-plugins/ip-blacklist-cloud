@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 2.5
+Stable tag: 2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ IP Blacklist Cloud plugin allows you to blacklist IP addresses from visiting you
 New feature has been added to plugin which allows you to block usernames from spamming (comments) on your website.
 
 
-Premium Service (Cloud Account) is no more available on our server. Now you can use Import / Export function.
+Premium Software for managing multiple WordPress websites for synchronization: IP Blacklist Cloud Server - http://ip-finder.me/ipblc-server/
 
 
 == Installation ==
@@ -90,6 +90,9 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 2.6 =
+* Allow you to connect with IP Blacklist Cloud Server (Premium Software) http://ip-finder.me/ipblc-server/
 
 = 2.5 =
 * Shows details of Failed login attempts for single IP if attempts are less than or equals to 3. For 4 or above attempts, view details on each IP on separate page.

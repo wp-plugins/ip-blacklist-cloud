@@ -326,6 +326,9 @@ Send Email on Auto Block:
 
 
 <h3>Import/Export Blacklisted IP and Usernames Database</h3>
+<div id="setting-error-settings_updated" class="updated settings-error below-h2" style="color: #FF0000;">
+<b><a href="http://ip-finder.me/ipblc-server/" target=_blank style="color: red">Tired of importing / exporting among your websites? Get IP Blacklist Cloud Server!</div>
+</a></b>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 550px;">
 
@@ -635,13 +638,17 @@ function submitToDBUsername(username)
 
 <?php
 
-/*
-
 ?>
 
 <form method="post" ENCTYPE="multipart/form-data">
 <h3>Cloud Settings</h3>
 <BR><b>Note: If you have purchased IP Cloud Server and it is running, turn on "Connect to Cloud" option and set password for this website.</b><BR>
+
+<BR><BR>
+<div id="setting-error-settings_updated" class="updated settings-error below-h2" style="color: #FF0000;">
+
+<b><a href="http://ip-finder.me/ipblc-server/" target=_blank  style="color: red">What is IP Blacklist Cloud Server?</a></b>
+</div>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 650px;">
 
@@ -692,7 +699,6 @@ $option2_1="";
 </form>
 <?php
 
-*/
 
 ?>
 <script>

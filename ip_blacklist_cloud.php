@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
-Version: 2.5
+Version: 2.6
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -1467,6 +1467,69 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP
 
 	exit();
 	}
+
+
+	if($_GET['action']=="deleteBlacklistIP")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+			
+		$IP=$_GET['IP'];
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+
+		if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+		{
+			$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP=\"$IP\"");
+			if($IP_in_DP)
+			{
+
+				$table=$wpdb->prefix."IPBLC_blacklist";
+				$time=time();
+
+				$wpdb->query("DELETE FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP=\"$IP\"");
+
+					$contextData = array (
+ 			                'method' => 'POST',
+			                'header' => "Connection: close\r\n".
+ 			             "Referer: ".site_url()."\r\n");
+					$context = stream_context_create(array
+					( 'http' => $contextData ));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));					$post_to_cloud =  file_get_contents (
+			                  $link,  // page url
+			                  false,
+			                  $context);
+
+				$AllData[]=array("IP"=>$IP,"deleted"=>1);
+			}
+			else
+			{
+				$AllData[]=array("IP"=>$IP,"deleted"=>0);
+			}
+
+		}
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			
+	    }
+		$result['DATA']=$AllData;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+
+	exit();
+	}
+
+
 
 
 	if($_GET['action']=="verifyCloudLogin")
