@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 2.6
+Stable tag: 2.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,9 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 2.7 =
+* Changed site_url() to get_bloginfo('url') for AJAX call. site_url() was having problem for those who set WordPress URL and Website URL different.
 
 = 2.6 =
 * Allow you to connect with IP Blacklist Cloud Server (Premium Software) http://ip-finder.me/ipblc-server/
