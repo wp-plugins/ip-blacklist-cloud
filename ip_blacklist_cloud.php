@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
-Version: 2.7
+Version: 2.8
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -382,6 +382,7 @@ function page_IPBLC_actions()
 	add_submenu_page( "wp-IPBLC", "Whitelist", "Whitelist", "manage_options", "wp-IPBLC-whitelist", "blacklist_whitelist" );
 
 	add_submenu_page( "wp-IPBLC", "EXTRA SECURITY", "EXTRA SECURITY", "manage_options", "wp-IPBLC-extra", "blacklist_extra" );
+	add_submenu_page( "wp-IPBLC", "Fixes", "Fixes", "manage_options", "wp-IPBLC-fixes", "blacklist_fixes" );
 	add_submenu_page( "wp-IPBLC", "Support", "Support", "manage_options", "wp-IPBLC-support", "blacklist_support" );
 
 
@@ -443,6 +444,11 @@ function blacklist_support()
 function blacklist_extra()
 {
 	include "blacklist-extra.php";
+}
+
+function blacklist_fixes()
+{
+	include "blacklist-fixes.php";
 }
 
 
@@ -662,7 +668,8 @@ function create_sql()
 		dbDelta($sql);
 	}
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE  `USERNAME` `USERNAME` VARCHAR( 1000 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
+
+		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE  `USERNAME` `USERNAME` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
 
 		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
 		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
@@ -673,8 +680,8 @@ function create_sql()
 
 		if(!$checkVisits)
 		{
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ADD  `visits` INT( 255 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ADD  `visits` INT( 255 ) NOT NULL");
+		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ADD  `visits` INT( 50 ) NOT NULL");
+		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ADD  `visits` INT( 50 ) NOT NULL");
 		}
 		else
 		{
@@ -684,11 +691,11 @@ function create_sql()
 			{
 				$visitType=$checkType[0]->Type;
 
-				if($visitType!="int(255)")
+				if($visitType!="int(50)")
 				{
 				//echo $visitType;
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `visits`  `visits` INT( 255 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `visits`  `visits` INT( 255 ) NOT NULL");
+		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
+		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
 				}
 			}
 
