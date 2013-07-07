@@ -3,8 +3,8 @@ Contributors: ad33lx
 Donate link: 
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
-Tested up to: 3.5.1
-Stable tag: 2.8
+Tested up to: 3.5.2
+Stable tag: 2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,14 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 2.9 =
+* Sub-menu added to fix tables (create indexes). NEW - IMPORTANT!
+* Blacklist IP now shows last attack (attack after blocking).
+* Sends Failed Login attempts details of last 5 attempts in email.
+* Blacklist IP page now shows 50 IP addresses per page.
+* Failed Login page now shows 50 IP addresses per page.
+
 
 = 2.8 =
 * Sub-menu added to fix tables (create indexes). IMPORTANT!

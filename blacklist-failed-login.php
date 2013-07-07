@@ -59,39 +59,24 @@ echo "<div id='setting-error-settings_updated' class='updated settings-error'>
 
 
 //--Posts per page
-
-$rowsPerPage = 30;
-
-
+$rowsPerPage = 50;
 
 // by default we show first page
-
 $pageNum = 1;
 
-
-
 // if $_GET['page'] defined, use it as page number
-
 if(isset($_GET['page_num']))
-
 {
-
     $pageNum = $_GET['page_num'];
-
 }
 
 
 
 // counting the offset
-
 $offset = ($pageNum - 1) * $rowsPerPage;
-
 $page_num=$pageNum;
 
 //---------------------------------------------------------------------------------
-
-
-
 
 $orderby=$_GET['orderby'];
 $order=$_GET['order'];
