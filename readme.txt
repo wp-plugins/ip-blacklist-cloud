@@ -98,7 +98,6 @@ http://demo.ip-finder.me/demo-details/
 * Blacklist IP page now shows 50 IP addresses per page.
 * Failed Login page now shows 50 IP addresses per page.
 
-
 = 2.8 =
 * Sub-menu added to fix tables (create indexes). IMPORTANT!
 
