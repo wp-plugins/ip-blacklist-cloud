@@ -100,23 +100,9 @@ global $wpdb,$USER_globale,$USER_error,$found;
 
 		//---post blacklist data to ip-finder.me
 
-		$contextData = array ( 
-		'method' => 'POST',
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n"); 
-
-		$context = stream_context_create (array ( 'http' => $contextData ));
-
 
 		$USER2=urlencode($USER);
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-		$post_to_cloud =  file_get_contents (
-		$link,
-		false,
-		$context);
-
+		post_blacklist_add_user($USER2);
 
 
 

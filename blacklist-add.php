@@ -100,38 +100,8 @@ global $wpdb,$IP_globale,$IP_error,$found;
 
 
 
-//---post data to ip-finder.me
-
-$contextData = array ( 
-
-                'method' => 'POST',
-
-                'header' => "Connection: close\r\n". 
-
-             "Referer: ".site_url()."\r\n");
-
- 
-
-// Create context resource for our request
-
-$context = stream_context_create (array ( 'http' => $contextData ));
-
- 
-
-// Read page rendered as result of your POST request
-
-
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-$post_to_cloud =  file_get_contents (
-
-                  $link,  // page url
-
-                  false,
-
-                  $context);
-
+			//---post data to ip-finder.me
+			post_blacklist_add($IP);
 
 
 
@@ -241,12 +211,9 @@ IP:
 <input type="submit" name="add_ip" id="add_ip" value="Add IP" class="button-primary">
 
 </td>
-
 </tr>
-
 </table>
 
 </form>
-
 </div>
 

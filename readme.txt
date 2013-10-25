@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 3.5.2
-Stable tag: 2.9
+Stable tag: 2.91
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,10 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+
+= 2.91 =
+* Quick Fix for 406 error while connecting to ip-finder.me
 
 = 2.9 =
 * Sub-menu added to fix tables (create indexes). NEW - IMPORTANT!

@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
-Version: 2.9
+Version: 2.91
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -53,22 +53,7 @@ function ip_added()
 
 
 		//---post blacklist data to ip-finder.me
-
-		$contextData = array ( 
-		'method' => 'POST',
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n"); 
-
-		$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-		$post_to_cloud =  file_get_contents (
-		$link,
-		false,
-		$context);
-
+			post_blacklist_add($IP);
 		}
 		else
 		{
@@ -138,24 +123,10 @@ function user_added()
 //$wpdb->print_error();
 
 
-		//---post blacklist data to ip-finder.me
+			//---post blacklist data to ip-finder.me
 
-		$contextData = array ( 
-		'method' => 'POST',
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n"); 
-
-		$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-		$USER2=urlencode($USER);
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-		$post_to_cloud =  file_get_contents (
-		$link,
-		false,
-		$context);
+			$USER2=urlencode($USER);
+			post_blacklist_add_user($USER2);
 
 		}
 		else
@@ -398,10 +369,19 @@ function page_IPBLC_actions()
 	{
 		//---post blacklist data to ip-finder.me
 
-		$contextData = array ( 
-		'method' => 'POST',
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
 		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n"); 
+		"Referer: ".site_url()."\r\n");
+
+ 
+
+
 
 		$context = stream_context_create (array ( 'http' => $contextData ));
 
@@ -491,10 +471,17 @@ function blacklist_stats()
 {
 	//---post data to ip-finder.me
 
-	$contextData = array ( 
-	'method' => 'POST',
-	'header' => "Connection: close\r\n". 
-	"Referer: ".site_url()."\r\n");
+
+		$data = array('test' => '1');
+
+
+
+		$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
 
 	$context = stream_context_create (array ( 'http' => $contextData ));
 
@@ -1487,17 +1474,11 @@ if(isset($_GET['page_num']))
 			{
 				$table=$wpdb->prefix."IPBLC_blacklist";
 				$time=time();
-				$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES(\"$IP\",\"$time\")");				
-					$contextData = array (
- 			                'method' => 'POST',
-			                'header' => "Connection: close\r\n".
- 			             "Referer: ".site_url()."\r\n");
-					$context = stream_context_create(array
-					( 'http' => $contextData ));
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));					$post_to_cloud =  file_get_contents (
-			                  $link,  // page url
-			                  false,
-			                  $context);
+				$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES(\"$IP\",\"$time\")");	
+
+				 post_blacklist_add($IP);
+
+
 
 				$AllData[]=array("IP"=>$IP,"added"=>1);
 			}
@@ -1549,10 +1530,22 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP
 
 				$wpdb->query("DELETE FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP=\"$IP\"");
 
-					$contextData = array (
- 			                'method' => 'POST',
-			                'header' => "Connection: close\r\n".
- 			             "Referer: ".site_url()."\r\n");
+
+
+
+				$data = array('test' => '1');
+
+
+
+				$contextData = array ( 
+			                'method' => 'POST',
+					'content' => http_build_query($data),
+					'header' => "Connection: close\r\n". 
+					"Referer: ".site_url()."\r\n");
+
+ 
+
+
 					$context = stream_context_create(array
 					( 'http' => $contextData ));
 $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));					$post_to_cloud =  file_get_contents (
@@ -1672,24 +1665,10 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 //$wpdb->print_error();
 
 
-		//---post blacklist data to ip-finder.me
+			//---post blacklist data to ip-finder.me
 
-		$contextData = array ( 
-		'method' => 'POST',
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n"); 
-
-		$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-		$USER2=urlencode($USER);
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-		$post_to_cloud =  file_get_contents (
-		$link,
-		false,
-		$context);
+			$USER2=urlencode($USER);
+			post_blacklist_add_user($USER2);
 
 		}
 		else
@@ -1757,29 +1736,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USE
 
 
 					//---post data to ip-finder.me
-
-					$contextData = array ( 
-				                'method' => 'POST',
-				                'header' => "Connection: close\r\n". 
-						"Referer: ".site_url()."\r\n");
-
-					// Create context resource for our request
-
-					$context = stream_context_create (array ( 'http' => $contextData ));
-
- // Read page rendered as result of your POST request
-
-
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-$post_to_cloud =  file_get_contents (
-
-                  $link,  // page url
-
-                  false,
-
-                  $context);
+					post_blacklist_add($IP);
 
 
 				}
@@ -1963,11 +1920,18 @@ $post_to_cloud =  file_get_contents (
 				{
 					//---post blacklist data to ip-finder.me
 
-					$contextData = array ( 
-					'method' => 'POST',
-					'header' => "Connection: close\r\n". 
-					"Referer: ".site_url()."\r\n"); 
 
+					$data = array('test' => '1');
+
+
+
+					$contextData = array ( 
+				                'method' => 'POST',
+						'content' => http_build_query($data),
+						'header' => "Connection: close\r\n". 
+						"Referer: ".site_url()."\r\n");
+
+ 
 					$context = stream_context_create (array ( 'http' => $contextData ));
 
 
@@ -2054,10 +2018,18 @@ $post_to_cloud =  file_get_contents (
 				{
 					//---post blacklist data to ip-finder.me
 
-					$contextData = array ( 
-					'method' => 'POST',
-					'header' => "Connection: close\r\n". 
-					"Referer: ".site_url()."\r\n"); 
+
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
 
 					$context = stream_context_create (array ( 'http' => $contextData ));
 
@@ -2118,11 +2090,18 @@ $post_to_cloud =  file_get_contents (
 				{
 					//---post blacklist data to ip-finder.me
 
-					$contextData = array ( 
-					'method' => 'POST',
-					'header' => "Connection: close\r\n". 
-					"Referer: ".site_url()."\r\n"); 
 
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
 					$context = stream_context_create (array ( 'http' => $contextData ));
 
 
@@ -2182,11 +2161,18 @@ $post_to_cloud =  file_get_contents (
 				{
 					//---post blacklist data to ip-finder.me
 
-					$contextData = array ( 
-					'method' => 'POST',
-					'header' => "Connection: close\r\n". 
-					"Referer: ".site_url()."\r\n"); 
 
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
 					$context = stream_context_create (array ( 'http' => $contextData ));
 
 
@@ -2292,23 +2278,7 @@ $post_to_cloud =  file_get_contents (
 
 
 						//---post blacklist data to ip-finder.me
-
-						$contextData = array ( 
-						'method' => 'POST',
-						'header' => "Connection: close\r\n". 
-						"Referer: ".site_url()."\r\n"); 
-
-						$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-
-
+						post_blacklist_add($IP);
 
 
 						}
@@ -2380,26 +2350,10 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP
 
 
 
-
-						//---post blacklist data to ip-finder.me
-
-						$contextData = array ( 
-						'method' => 'POST',
-						'header' => "Connection: close\r\n". 
-						"Referer: ".site_url()."\r\n"); 
-
-						$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-
 						$USER2=urlencode($USER);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
+						post_blacklist_add_user($USER2);
 
 
 
@@ -2485,25 +2439,8 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USE
 
 					$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES('$IP','$time')");
 
-//---post data to ip-finder.me
-
-$contextData = array ( 
-                'method' => 'POST',
-                'header' => "Connection: close\r\n". 
-             "Referer: ".site_url()."\r\n");
-
- // Create context resource for our request
-$context = stream_context_create (array ( 'http' => $contextData ));
-
- // Read page rendered as result of your POST request
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-$post_to_cloud =  file_get_contents (
-                  $link,  // page url
-                  false,
-                  $context);
-
+					//---post data to ip-finder.me
+					post_blacklist_add($IP);
 
 			}
 			echo "Done";
@@ -2555,23 +2492,9 @@ $post_to_cloud =  file_get_contents (
 
 		//---post blacklist data to ip-finder.me
 
-		$contextData = array ( 
-		'method' => 'POST',
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n"); 
-
-		$context = stream_context_create (array ( 'http' => $contextData ));
-
-
 		$USER2=urlencode($USER);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
-
-		$post_to_cloud =  file_get_contents (
-		$link,
-		false,
-		$context);
-
+		post_blacklist_add_user($USER2);
 
 			}
 			echo "Done";
@@ -2615,10 +2538,18 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USE
 				{
 					//---post blacklist data to ip-finder.me
 
-					$contextData = array ( 
-					'method' => 'POST',
-					'header' => "Connection: close\r\n". 
-					"Referer: ".site_url()."\r\n"); 
+
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
 
 					$context = stream_context_create (array ( 'http' => $contextData ));
 
@@ -2726,10 +2657,18 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USE
 					$wpdb->query("TRUNCATE TABLE ".$wpdb->prefix."IPBLC_blacklist");
 
 
-					$contextData = array ( 
-					'method' => 'POST',
-					'header' => "Connection: close\r\n". 
-					"Referer: ".site_url()."\r\n"); 
+
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
 
 					$context = stream_context_create (array ( 'http' => $contextData ));
 
@@ -2935,20 +2874,8 @@ function IPBLC_login_failed(){
 
 
 
-				$contextData = array ( 
-						'method' => 'POST',
-						'header' => "Connection: close\r\n".
-						"Referer: ".site_url()."\r\n");
+				post_blacklist_add($visitorIP);
 
-				$context = stream_context_create (array ( 'http' => $contextData ));
-
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$visitorIP."&website=".urlencode(site_url())."&website_name=".
-urlencode(get_bloginfo('name'));
-
-				$post_to_cloud =  file_get_contents (
-						$link,  // page url
-						false,
-						$context);
 
 				if($IPBLC_failedlogin_email)
 				{
@@ -3178,11 +3105,18 @@ function verifyCloudAccount($echo=false)
 	{
 		//---post blacklist data to ip-finder.me
 
-		$contextData = array ( 
-		'method' => 'POST',
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n"); 
 
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
 		$context = stream_context_create (array ( 'http' => $contextData ));
 
 		$email2=urlencode($IPBLC_cloud_email);
@@ -3346,6 +3280,70 @@ function isIpSafe($checkIP)
 
 
 	return $isIPSafe1;
+
+}
+
+
+
+function post_blacklist_add($IP)
+{
+
+
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
+
+// Create context resource for our request
+
+$context = stream_context_create (array ( 'http' => $contextData ));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+
+$post_to_cloud =  file_get_contents (
+                  $link,  // page url
+                  false,
+                  $context);
+
+
+//	echo "return: $post_to_cloud";
+
+
+}
+
+function post_blacklist_add_user($user)
+{
+
+
+$data = array('test' => '1');
+
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
+
+// Create context resource for our request
+
+$context = stream_context_create (array ( 'http' => $contextData ));
+
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$user."&website=".
+urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+
+$post_to_cloud =  file_get_contents (
+                  $link,  // page url
+                  false,
+                  $context);
 
 }
 ?>
