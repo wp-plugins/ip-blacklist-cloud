@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
-Version: 2.91
+Version: 3.0
 Author: Adeel Ahmed
 Author URI: http://demo.ip-finder.me/demo-details/
 */
@@ -312,8 +312,13 @@ function page_IPBLC_actions()
 	$table1=$wpdb->prefix."IPBLC_login_failed";
 	$table2= $wpdb->prefix."IPBLC_blacklist";
 	$countMain="";
+	$countOld="";
+	$time=time();
+	$days_90=$time-(90*24*60*60);
+
 
 	$rr=$wpdb->get_results("SELECT * FROM $table1 t1 WHERE NOT EXISTS (SELECT 1 FROM $table2 t2 WHERE t1.IP = t2.IP)");
+	$old=$wpdb->get_results("SELECT * FROM $table2 WHERE timestamp<=$days_90 && lastvisit<=$days_90");
 
 	//print_r($rr);
 
@@ -327,6 +332,12 @@ function page_IPBLC_actions()
 	{
 		$newFailed="";
 		$countMain="";
+	}
+
+	if($old)
+	{
+		$countOld='<span class="awaiting-mod count-'.count($old).'"><span class="pending-count">'.count($old).'</span></span>';
+
 	}
 
 	if($newFailed>0)
@@ -345,6 +356,7 @@ function page_IPBLC_actions()
 	add_submenu_page( "wp-IPBLC", "Username Blacklist", "User Blacklist", "manage_options", "wp-IPBLC-list-user", "blacklist_tool_user" );
 	add_submenu_page( "wp-IPBLC", "Add username to Blacklist", "Add User to Blacklist", "manage_options", "wp-IPBLC-Add-User", "blacklist_add_user" );
 
+	add_submenu_page( "wp-IPBLC", "Auto Block", "Auto Block", "manage_options", "wp-IPBLC-auto-block", "auto_block" );
 	if($newFailed>0)
 	{
 	add_submenu_page( "wp-IPBLC", "Failed Login", "<font color=red>Failed Login ($newFailed)</font>", "manage_options", "wp-IPBLC-failed-login", "blacklist_failed_login" );
@@ -358,6 +370,18 @@ function page_IPBLC_actions()
 
 	add_submenu_page( "wp-IPBLC", "EXTRA SECURITY", "EXTRA SECURITY", "manage_options", "wp-IPBLC-extra", "blacklist_extra" );
 	add_submenu_page( "wp-IPBLC", "Fixes", "Fixes", "manage_options", "wp-IPBLC-fixes", "blacklist_fixes" );
+
+	if($countOld)
+	{
+	add_submenu_page( "wp-IPBLC", "Old IPs", "Old IPs $countOld", "manage_options", "wp-IPBLC-old-ip", "blacklist_old_ip" );
+
+	}
+	else
+	{
+	add_submenu_page( "wp-IPBLC", "Old IPs", "Old IPs", "manage_options","wp-IPBLC-old-ip", "blacklist_old_ip" );
+	}
+
+
 	add_submenu_page( "wp-IPBLC", "Support", "Support", "manage_options", "wp-IPBLC-support", "blacklist_support" );
 
 
@@ -440,6 +464,12 @@ function blacklist_tool()
 {
 	include "blacklist-list.php";
 }
+
+function blacklist_old_ip()
+{
+	include "blacklist-old-list.php";
+}
+
 function blacklist_tool_user()
 {
 	include "blacklist-list-user.php";
@@ -452,6 +482,11 @@ function blacklist_settings()
 	include "blacklist-settings.php";
 
 }
+function auto_block()
+{
+	include "auto-block.php";
+}
+
 
 function blacklist_add()
 {
@@ -723,7 +758,7 @@ function create_sql()
 		//---last visit end---
 
 
-	if($_GET['blacklist'])
+	if(isset($_GET['blacklist']))
 	{
 
 		//print_r($_SERVER);
@@ -737,7 +772,7 @@ function create_sql()
 
 
 
-	if($_GET['blacklistuser'])
+	if(isset($_GET['blacklistuser']))
 	{
 
 		//print_r($_SERVER);
@@ -879,6 +914,9 @@ header("HTTP/1.0 404 Not Found");
 	<?php
 		exit();
 	}
+
+	if(isset($_GET['action']))
+	{
 
 	if($_GET['action']=="getFailedPagination")
 	{
@@ -1502,6 +1540,131 @@ if(isset($_GET['page_num']))
 	}
 
 
+	if($_GET['action']=="addBlacklistIP_multi")
+	{
+		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
+		$IPBLC_cloud_on=get_option('IPBLC_cloud_on');
+
+		$pwd=urldecode($_GET['pwd']);
+		$result=array();
+
+		header('Content-Type: application/json');
+			$AllData=array();
+			
+
+	    if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
+	    {
+			$result['verify']="1";
+
+
+			$IPx=$_GET['IP'];
+			$IPx=explode(",",$IPx);
+
+			//print_r($IPx);
+
+			$IP="";
+			$IPData=array();
+
+			$request_IP=array();
+
+			$where_sql=" WHERE ";
+			$sep="";
+
+			foreach($IPx as $IP)
+			{
+				if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+				{
+					$request_IP[]=$IP;
+					$where_sql.=$sep."IP=\"$IP\"";
+
+					$sep=" OR ";
+			
+
+				}
+			}
+
+			if($request_IP)
+			{
+
+					post_blacklist_add_multi($request_IP);
+
+
+				$sql="SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist $where_sql";
+				//echo $sql;
+
+
+				foreach($request_IP as $IP)
+				{
+
+
+					$table=$wpdb->prefix."IPBLC_blacklist";
+					$time=time();
+
+ $sql ="INSERT INTO $table (IP,timestamp) SELECT * FROM (SELECT \"$IP\", \"$time\") AS tmp WHERE NOT EXISTS (SELECT IP,timestamp FROM $table WHERE IP=\"$IP\")";
+
+					//echo $sql."\n";
+
+					$wpdb->query($sql);	
+
+
+
+					$IPData[]=array("IP"=>$IP,"added"=>1);
+
+				}
+
+			}
+
+
+
+
+/*
+		foreach($IPx as $IP)
+		{
+
+
+		if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+		{
+			$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP=\"$IP\"");
+			if(!$IP_in_DP)
+			{
+				$table=$wpdb->prefix."IPBLC_blacklist";
+				$time=time();
+				$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES(\"$IP\",\"$time\")");	
+
+				// post_blacklist_add($IP);
+
+
+
+				$IPData[]=array("IP"=>$IP,"added"=>1);
+			}
+			else
+			{
+				$IPData[]=array("IP"=>$IP,"added"=>2);
+			}
+
+		}
+
+
+		}
+
+*/
+
+
+	    }//-------passed cloud login-----
+	    else
+	    {
+			$result['verify']="-1";
+			
+	    }
+		$AllData['IPData']=$IPData;
+		$result['DATA']=$AllData;
+		echo $_GET['callback']."(".json_encode($result).")";
+
+
+	exit();
+	}
+
+
 	if($_GET['action']=="deleteBlacklistIP")
 	{
 		$IPBLC_cloud_password=get_option('IPBLC_cloud_password');
@@ -1624,8 +1787,10 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 		}
 	exit();
 	}
+	}
 
-
+	if(isset($_POST['action']))
+	{
 	if($_POST['action']=="blacklistUSERJS")
 	{
 		if(current_user_can( 'manage_options' ))
@@ -1766,9 +1931,12 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 		}
 		exit();
 	}
-	
+	}	
 
 	//-----export Database-----
+
+	if(isset($_REQUEST['action']))
+	{
 
 
 	if($_REQUEST['action']=="exportIPCloud")
@@ -1838,7 +2006,6 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 
 	//-----Import Database-----
 
-
 	if($_REQUEST['action']=="importCSVIPCloud")
 	{
 		if(current_user_can( 'manage_options' ) && $_REQUEST['filename'])
@@ -1884,522 +2051,13 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 
 		exit();
 	}
+	}
+
 	//------end Import-----
 
-	if($_POST['action']=="verifyCloudAccount")
+
+	if(isset($_POST['action']))
 	{
-		if(current_user_can( 'manage_options' ))
-		{
-			verifyCloudAccount(true);
-		}
-
-		exit();
-	}
-	if($_POST['action']=="updateToCloud")
-	{
-		if(current_user_can( 'manage_options' ))
-		{
-			$status=verifyCloudAccount(false);
-
-			if($status=="-1")
-			{
-				echo "<font color=red><b>Invalid Cloud Account Details.</b></font>";
-
-			}
-			elseif($status=="-2")
-			{
-				echo "<font color=red><b>Your Cloud Account has Expired.</b></font>";
-
-			}
-			else
-			{
-				$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
-				$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
-
-				if($IPBLC_cloud_email && $IPBLC_cloud_key)
-				{
-					//---post blacklist data to ip-finder.me
-
-
-					$data = array('test' => '1');
-
-
-
-					$contextData = array ( 
-				                'method' => 'POST',
-						'content' => http_build_query($data),
-						'header' => "Connection: close\r\n". 
-						"Referer: ".site_url()."\r\n");
-
- 
-					$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-					$email2=urlencode($IPBLC_cloud_email);
-					$cloudKey=urlencode($IPBLC_cloud_key);
-
-
-
-				}
-
-				$IPs_in_DP=$wpdb->get_results("SELECT IP FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY id DESC");
-
-					$AllData=array();
-
-				if($IPs_in_DP)
-				{
-					foreach($IPs_in_DP as $this_IP)
-					{
-						$IPx['IP']=$this_IP->IP;
-						$AllData[]=$IPx;
-
-					}
-				}
-
-
-
-				$USERs_in_DP=$wpdb->get_results("SELECT USERNAME FROM ".$wpdb->prefix."IPBLC_usernames ORDER BY id DESC");
-
-				if($USERs_in_DP)
-				{
-					foreach($USERs_in_DP as $this_USER)
-					{
-						
-						$USERx=$this_USER->USERNAME;
-						$USERx=str_replace("&quot;",'"',$USERx);
-
-						$USERx=urlencode($USERx);
-						$userxx['username']=$USERx;
-						$AllData[]=$userxx;
-						
-					}
-				}
-
-				if($AllData)
-				{
-
-					echo json_encode($AllData);
-				}
-				else
-				{
-					echo "-1";
-				}
-
-
-
-			}
-
-		}
-
-		exit();
-	}
-	if($_POST['action']=="submitToCloudIP")
-	{
-		if(current_user_can( 'manage_options' ))
-		{
-			$status=verifyCloudAccount(false);
-
-			if($status=="-1")
-			{
-				echo "<font color=red><b>Invalid Cloud Account Details.</b></font>";
-
-			}
-			elseif($status=="-2")
-			{
-				echo "<font color=red><b>Your Cloud Account has Expired.</b></font>";
-
-			}
-			else
-			{
-				$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
-				$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
-
-				if($IPBLC_cloud_email && $IPBLC_cloud_key)
-				{
-					//---post blacklist data to ip-finder.me
-
-
-$data = array('test' => '1');
-
-
-
-$contextData = array ( 
-                'method' => 'POST',
-		'content' => http_build_query($data),
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n");
-
- 
-
-					$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-					$email2=urlencode($IPBLC_cloud_email);
-					$cloudKey=urlencode($IPBLC_cloud_key);
-
-
-
-				}
-				$IPx=$_POST['IP'];
-
-
-				if($IPx)
-				{
-
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/updateToCloud.php?email=$email2"."&cloudkey=".$cloudKey."&IP=$IPx";
-
-						//echo $link."<BR>";
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-						echo "Done";
-
-
-				}
-
-			}
-
-		}
-
-		exit();
-	}
-	if($_POST['action']=="submitToCloudUSER")
-	{
-		if(current_user_can( 'manage_options' ))
-		{
-			$status=verifyCloudAccount(false);
-
-			if($status=="-1")
-			{
-				echo "<font color=red><b>Invalid Cloud Account Details.</b></font>";
-
-			}
-			elseif($status=="-2")
-			{
-				echo "<font color=red><b>Your Cloud Account has Expired.</b></font>";
-
-			}
-			else
-			{
-				$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
-				$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
-
-				if($IPBLC_cloud_email && $IPBLC_cloud_key)
-				{
-					//---post blacklist data to ip-finder.me
-
-
-$data = array('test' => '1');
-
-
-
-$contextData = array ( 
-                'method' => 'POST',
-		'content' => http_build_query($data),
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n");
-
- 
-					$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-					$email2=urlencode($IPBLC_cloud_email);
-					$cloudKey=urlencode($IPBLC_cloud_key);
-
-
-
-				}
-				$USERx=$_POST['USER'];
-
-
-				if($USERx)
-				{
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/updateToCloud.php?email=$email2"."&cloudkey=".$cloudKey."&USER=$USERx";
-
-
-						//echo $link."<BR>";
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-						echo "Done";
-
-
-				}
-
-			}
-
-		}
-
-		exit();
-	}
-	if($_POST['action']=="updateFromCloud")
-	{
-		if(current_user_can( 'manage_options' ))
-		{
-			$status=verifyCloudAccount(false);
-
-			if($status=="-1")
-			{
-				echo "<font color=red><b>Invalid Cloud Account Details.</b></font>";
-
-			}
-			elseif($status=="-2")
-			{
-				echo "<font color=red><b>Your Cloud Account has Expired.</b></font>";
-
-			}
-			else
-			{
-				$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
-				$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
-
-				if($IPBLC_cloud_email && $IPBLC_cloud_key)
-				{
-					//---post blacklist data to ip-finder.me
-
-
-$data = array('test' => '1');
-
-
-
-$contextData = array ( 
-                'method' => 'POST',
-		'content' => http_build_query($data),
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n");
-
- 
-					$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-					$email2=urlencode($IPBLC_cloud_email);
-					$cloudKey=urlencode($IPBLC_cloud_key);
-
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/updateFromCloud.php?email=$email2"."&cloudkey=".$cloudKey."&GETDB=IP";
-
-						//echo $link."<BR>";
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-
-
-
-
-					$IPs=json_decode($post_to_cloud);
-
-
-
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/updateFromCloud.php?email=$email2"."&cloudkey=".$cloudKey."&GETDB=USERS";
-
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-
-
-					$USERs=json_decode($post_to_cloud);
-
-					$AllData=array();
-
-					$IPx=array();
-					$userx=array();
-					if($IPs)
-					{
-						foreach($IPs as $this_IP)
-						{
-							//print_r($this_IP);
-							$IPx['IP']=$this_IP->IP;
-							$AllData[]=$IPx;
-
-						}
-
-
-					}
-
-					if($USERs)
-					{
-						$USER="";
-						foreach($USERs as $this_user)
-						{
-							
-							$USER=$this_user->USERNAME;
-							$user2=urlencode($USER);	
-
-							$userx['username']=$user2;
-							$AllData[]=$userx;
-						}
-
-
-					}
-
-
-					if($AllData)
-					{
-						echo json_encode($AllData);
-					}
-					else
-					{
-						echo "-1";
-
-					}
-
-					//echo "IPS: ";
-					//print_r($IPs);
-
-/*
-
-				if($IPs)
-				{
-				  foreach($IPs as $this_IP)
-				  {
-					$IP=$this_IP->IP;	
-
-					if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
-					{
-						$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
-						if(!$IP_in_DP)
-						{
-
-							$table=$wpdb->prefix."IPBLC_blacklist";
-							$time=time();
-
-
-
-					$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES('$IP','$time')");
-
-
-
-
-						//---post blacklist data to ip-finder.me
-						post_blacklist_add($IP);
-
-
-						}
-					}
-
-				  }
-
-				echo "Updated IP Database from Cloud.<BR>";
-
-				}
-				else
-				{
-					if($post_to_cloud=="-1")
-					{
-						echo "<font color=red>Invalid email address or cloudkey for Cloud Account.</font><BR>";
-					}
-					elseif($post_to_cloud=="-2")
-					{
-						echo "<font color=red>Your Cloud Account has expired.</font><BR>";
-					}
-					else
-					{
-						echo $post_to_cloud;
-					}
-
-				}
-
-
-
-				//echo "Usernames database....<BR>";
-
-
-
-
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/updateFromCloud.php?email=$email2"."&cloudkey=".$cloudKey."&GETDB=USERS";
-
-						//echo $link."<BR>";
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-
-					//echo $post_to_cloud;
-
-					$USERS=json_decode($post_to_cloud);
-					
-				
-
-
-
-				if($USERS)
-				{
-				  foreach($USERS as $this_USER)
-				  {
-					$USER=$this_USER->USERNAME;	
-
-					if($USER)
-					{
-						$USER_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_usernames WHERE USERNAME=\"$USER\"");
-						if(!$USER_in_DP)
-						{
-
-							$table=$wpdb->prefix."IPBLC_usernames";
-							$time=time();
-
-
-					$wpdb->query("INSERT INTO $table (USERNAME,timestamp) VALUES('$USER','$time')");
-
-
-
-						$USER2=urlencode($USER);
-
-
-						post_blacklist_add_user($USER2);
-
-
-
-
-						}
-					}
-
-				  }
-
-				echo "Updated Usernames Database from Cloud.<BR>";
-
-				}
-				else
-				{
-					if($post_to_cloud=="-1")
-					{
-						echo "<font color=red>Invalid email address or cloudkey for Cloud Account.</font><BR>";
-					}
-					elseif($post_to_cloud=="-2")
-					{
-						echo "<font color=red>Your Cloud Account has expired.</font><BR>";
-					}
-					else
-					{
-						echo $post_to_cloud;
-					}
-
-				}
-
-
-
-*/
-
-
-
-
-
-				}
-
-			}
-
-		}
-
-		exit();
-	}
-		
 
 
 
@@ -2507,280 +2165,7 @@ $contextData = array (
 		exit();
 	}
 
-
-
-
-
-
-
-	if($_POST['action']=="restoreToCloud")
-	{
-		if(current_user_can( 'manage_options' ))
-		{
-			$status=verifyCloudAccount(false);
-
-			if($status=="-1")
-			{
-				echo "<font color=red><b>Invalid Cloud Account Details.</b></font>";
-
-			}
-			elseif($status=="-2")
-			{
-				echo "<font color=red><b>Your Cloud Account has Expired.</b></font>";
-
-			}
-			else
-			{
-				$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
-				$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
-
-				if($IPBLC_cloud_email && $IPBLC_cloud_key)
-				{
-					//---post blacklist data to ip-finder.me
-
-
-$data = array('test' => '1');
-
-
-
-$contextData = array ( 
-                'method' => 'POST',
-		'content' => http_build_query($data),
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n");
-
- 
-
-					$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-					$email2=urlencode($IPBLC_cloud_email);
-					$cloudKey=urlencode($IPBLC_cloud_key);
-
-
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/restoreToCloud.php?email=$email2"."&cloudkey=".$cloudKey."&restore=1";
-
-						//echo $link."<BR>";
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-
-						//echo $post_to_cloud."<BR>";
-
-
-				}
-
-				$IPs_in_DP=$wpdb->get_results("SELECT IP FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY id DESC");
-
-					$AllData=array();
-
-				if($IPs_in_DP)
-				{
-					foreach($IPs_in_DP as $this_IP)
-					{
-						$IPx['IP']=$this_IP->IP;
-						$AllData[]=$IPx;
-
-					}
-				}
-
-
-
-				$USERs_in_DP=$wpdb->get_results("SELECT USERNAME FROM ".$wpdb->prefix."IPBLC_usernames ORDER BY id DESC");
-
-				if($USERs_in_DP)
-				{
-					foreach($USERs_in_DP as $this_USER)
-					{
-						
-						$USERx=$this_USER->USERNAME;
-						$USERx=str_replace("&quot;",'"',$USERx);
-
-						$USERx=urlencode($USERx);
-						$userxx['username']=$USERx;
-						$AllData[]=$userxx;
-						
-					}
-				}
-
-				if($AllData)
-				{
-
-					echo json_encode($AllData);
-				}
-				else
-				{
-					echo "-1";
-				}
-
-
-
-			}
-
-		}
-
-		exit();
 	}
-
-	if($_POST['action']=="restoreFromCloud")
-	{
-		if(current_user_can( 'manage_options' ))
-		{
-			$status=verifyCloudAccount(false);
-
-			if($status=="-1")
-			{
-				echo "<font color=red><b>Invalid Cloud Account Details.</b></font>";
-
-			}
-			elseif($status=="-2")
-			{
-				echo "<font color=red><b>Your Cloud Account has Expired.</b></font>";
-
-			}
-			else
-			{
-				$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
-				$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
-
-				if($IPBLC_cloud_email && $IPBLC_cloud_key)
-				{
-					//---post blacklist data to ip-finder.me
-
-
-
-					$wpdb->query("TRUNCATE TABLE ".$wpdb->prefix."IPBLC_usernames");
-
-
-					$wpdb->query("TRUNCATE TABLE ".$wpdb->prefix."IPBLC_blacklist");
-
-
-
-$data = array('test' => '1');
-
-
-
-$contextData = array ( 
-                'method' => 'POST',
-		'content' => http_build_query($data),
-		'header' => "Connection: close\r\n". 
-		"Referer: ".site_url()."\r\n");
-
- 
-
-					$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/restoreFromCloudDelete.php";
-
-						//echo $link."<BR>";
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-
-						//echo $post_to_cloud;
-
-
-
-					$email2=urlencode($IPBLC_cloud_email);
-					$cloudKey=urlencode($IPBLC_cloud_key);
-
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/updateFromCloud.php?email=$email2"."&cloudkey=".$cloudKey."&GETDB=IP";
-
-						//echo $link."<BR>";
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-
-
-
-
-					$IPs=json_decode($post_to_cloud);
-
-
-
-					$link="http://ip-finder.me/wp-content/themes/ipfinder/updateFromCloud.php?email=$email2"."&cloudkey=".$cloudKey."&GETDB=USERS";
-
-
-						$post_to_cloud =  file_get_contents (
-						$link,
-						false,
-						$context);
-
-
-					$USERs=json_decode($post_to_cloud);
-
-					$AllData=array();
-
-					$IPx=array();
-					$userx=array();
-					if($IPs)
-					{
-						foreach($IPs as $this_IP)
-						{
-							//print_r($this_IP);
-							$IPx['IP']=$this_IP->IP;
-							$AllData[]=$IPx;
-
-						}
-
-
-					}
-
-					if($USERs)
-					{
-						$USER="";
-						foreach($USERs as $this_user)
-						{
-							
-							$USER=$this_user->USERNAME;
-							$user2=urlencode($USER);	
-
-							$userx['username']=$user2;
-							$AllData[]=$userx;
-						}
-
-
-					}
-
-
-					if($AllData)
-					{
-						echo json_encode($AllData);
-					}
-					else
-					{
-						echo "-1";
-
-					}
-
-					//echo "IPS: ";
-					//print_r($IPs);
-
-
-
-
-
-
-				}
-
-			}
-
-		}
-
-		exit();
-	}
-
-
-
-
 
 
 
@@ -2817,6 +2202,7 @@ function IPBLC_login_failed(){
 	$visitor_time=$_SERVER['REQUEST_TIME'];
 	$visitor_user_agent=$_SERVER['HTTP_USER_AGENT'];
 
+	$IPBLC_failedlogin_email=get_option('IPBLC_failedlogin_email');
 
 
 	$isIPSafe=isIpSafe($visitorIP);
@@ -2838,6 +2224,64 @@ function IPBLC_login_failed(){
 	$wpdb->query("INSERT INTO $table (IP,variables,useragent,timestamp) VALUES(\"$visitorIP\",\"$postedData\",\"$visitor_user_agent\",\"$visitor_time\")");
 
 
+//-----check auto block username-----
+
+	
+	$login_user="";
+
+	if(isset($_POST['log']))
+	{
+		$login_user=$_POST['log'];
+
+	}
+
+
+	$IPBLC_autoblock=get_option('IPBLC_autoblock');
+	$username_block=0;
+
+	$IPBLC_autoblock=str_replace("\r\n","\n",$IPBLC_autoblock);
+	if($IPBLC_autoblock)
+	{
+		$IPBLC_autoblock_explode=explode("\n",$IPBLC_autoblock);
+		if($IPBLC_autoblock_explode)
+		{
+			foreach($IPBLC_autoblock_explode as $user)
+			{
+				$user=str_replace("\n","",$user);
+
+				if($user==$login_user && $user!="" && $login_user!="")
+				{
+					$username_block=1;
+
+				}
+			
+			}
+
+		}
+	}
+
+	if($username_block==1)
+	{
+		//echo "BLOCK!!<BR>";
+		$time=time();
+		$table2=$wpdb->prefix."IPBLC_blacklist";
+		$wpdb->query("INSERT INTO $table2 (IP,timestamp) VALUES('$visitorIP','$time')");
+
+		post_blacklist_add($visitorIP);
+
+		if($IPBLC_failedlogin_email)
+		{
+			//echo "sending mail!!";
+		$failedMessage="$visitorIP blacklisted on ".site_url()." due to login with username \"$login_user\"\r\n\r\nThank you for using IP Blacklist Cloud";
+		wp_mail($IPBLC_failedlogin_email,"$visitorIP Blacklisted (Auto Block)",$failedMessage);
+		}
+
+	}
+
+//-----check auto block username - END -----
+
+
+
 
 
 	$IPBLC_failedlogin_max=get_option('IPBLC_failedlogin_max');
@@ -2854,13 +2298,11 @@ function IPBLC_login_failed(){
 		$IPBLC_failedlogin_time=get_option('IPBLC_failedlogin_time');
 
 	}
-	$IPBLC_failedlogin_email=get_option('IPBLC_failedlogin_email');
 
 	$time=time();
 	$startTime=$time-($IPBLC_failedlogin_time*60);
 
 	$failedTotal=$wpdb->get_results("SELECT COUNT(*) as attempts FROM $table WHERE IP=\"$visitorIP\" AND timestamp>=$startTime AND timestamp<=$time");
-
 
 	if($failedTotal)
 	{
@@ -3249,8 +2691,12 @@ function blacklist_USER(USER,commentID)
 function isIpSafe($checkIP)
 {
 
+
 	$isIPSafe1=0;
 	$IPBLC_whitelist=get_option('IPBLC_whitelist');
+	$IPBLC_whitelist=str_replace("\r\n","\n",$IPBLC_whitelist);
+
+
 
 	if($IPBLC_whitelist)
 	{
@@ -3261,18 +2707,60 @@ function isIpSafe($checkIP)
 		{
 			$wIP=str_replace("\n","",$wIP);
 			$wIP=str_replace(" ","",$wIP);
-			$wIP_explode=explode(".",$wIP);
-			
-			$wIP2=intval($wIP_explode[0]).".".intval($wIP_explode[1]).".".intval($wIP_explode[2]).".".intval($wIP_explode[3]);
 
-			//echo "$visitorIP==$wIP2 -- ".ip2long($visitorIP)." -- ".ip2long($wIP2)."<BR>";
-
-			//echo "OK: ".filter_var($wIP2, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)."<BR>";
-
-			if(ip2long($checkIP)==ip2long($wIP2))
+			if($wIP)
 			{
-				//echo "SAFE";
-				$isIPSafe1=1;
+			$wIP_range=explode("-",$wIP);
+			//print_r($wIP_range);
+
+			$range=0;
+			if(count($wIP_range)>1)
+			{
+				$range=1;
+			}
+			
+			if($range==0)
+			{
+
+				//echo "no range...<BR>";
+
+				$wIP_explode=explode(".",$wIP);
+				$wIP2=intval($wIP_explode[0]).".".intval($wIP_explode[1]).".".intval($wIP_explode[2]).".".intval($wIP_explode[3]);
+
+				//echo "$visitorIP==$wIP2 -- ".ip2long($visitorIP)." -- ".ip2long($wIP2)."<BR>";
+
+				//echo "OK: ".filter_var($wIP2, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)."<BR>";
+
+				if(ip2long($checkIP)==ip2long($wIP2))
+				{
+					//echo "SAFE<BR>";
+					$isIPSafe1=1;
+				}
+			}
+			else
+			{
+				//echo "range...<BR>";
+
+
+				$wIP_explode1=explode(".",$wIP_range[0]);
+				$wIP_explode2=explode(".",$wIP_range[1]);
+				$wIP2_1=intval($wIP_explode1[0]).".".intval($wIP_explode1[1]).".".intval($wIP_explode1[2]).".".intval($wIP_explode1[3]);
+				$wIP2_2=intval($wIP_explode2[0]).".".intval($wIP_explode2[1]).".".intval($wIP_explode2[2]).".".intval($wIP_explode2[3]);
+
+				//echo "$visitorIP==$wIP2 -- ".ip2long($visitorIP)." -- ".ip2long($wIP2)."<BR>";
+
+				//echo "OK: ".filter_var($wIP2, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)."<BR>";
+				//	echo ip2long($checkIP).">=".ip2long($wIP2_1)." && ".ip2long($checkIP)."<=".ip2long($wIP2_2)."<BR>";
+
+				if(ip2long($checkIP)>=ip2long($wIP2_1) && ip2long($checkIP)<=ip2long($wIP2_2) )
+				{
+				//	echo ip2long($checkIP).">=".ip2long($wIP2_1)." && ".ip2long($checkIP)."<=".ip2long($wIP2_2);
+				//	echo "SAFE";
+					$isIPSafe1=1;
+				}
+			
+			}
+
 			}
 		}
 	}
@@ -3316,6 +2804,61 @@ $post_to_cloud =  file_get_contents (
 
 
 }
+
+
+
+
+
+function post_blacklist_add_multi($IPs)
+{
+
+
+$data = array('test' => '1');
+
+//print_r($IPs);
+
+if($IPs)
+{
+
+	$IP_var="";
+	$sep="";
+	
+	foreach($IPs as $IPx)
+	{
+		$IP_var.=$sep.$IPx;
+		$sep=",";
+	}
+
+
+$contextData = array ( 
+                'method' => 'POST',
+		'content' => http_build_query($data),
+		'header' => "Connection: close\r\n". 
+		"Referer: ".site_url()."\r\n");
+
+ 
+
+// Create context resource for our request
+
+$context = stream_context_create (array ( 'http' => $contextData ));
+$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add_multi.php?IP=".$IP_var."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+
+
+$post_to_cloud =  file_get_contents (
+                  $link,  // page url
+                  false,
+                  $context);
+
+
+//	echo "return: $post_to_cloud";
+
+
+}
+
+}
+
+
+
 
 function post_blacklist_add_user($user)
 {

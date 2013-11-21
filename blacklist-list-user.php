@@ -44,16 +44,14 @@ $USER_ID=$_GET['del'];
 
 
 
-
+$data = array('test' => '1');
 //---post data to ip-finder.me
-
 $contextData = array ( 
-
                 'method' => 'POST',
-
+		'content' => http_build_query($data),
                 'header' => "Connection: close\r\n". 
-
              "Referer: ".site_url()."\r\n");
+
 
  
 

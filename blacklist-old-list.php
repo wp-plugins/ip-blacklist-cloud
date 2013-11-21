@@ -16,13 +16,14 @@ global $check_all_url_open;
 
 <div id="icon-options-general" class="icon32"><br /></div>  
 
-<h2>IP Blacklist</h2>
+<h2>Old Blocked IP Address</h2>
 
 
 
 <BR>
 
-<B>NOTE:</B> After adding any IP to blacklist, please submit comment on IP-FINDER.ME to help others regarding the issue related to that specific IP.
+<h3>These blacklisted IP addresses did not attack in last 90 days. May be their servers are clean now.</h3>
+<h3 style="color: #FF0000;">If you are using <a href="http://ip-finder.me/ipblc-server/">IP Blacklist Cloud Server</a>. Please do not delete these dead IP addresses from this page. Wait for IP Blacklist Cloud Server new version.</h3>
 
 <BR>
 <div style="float: right; right: 8px;">
@@ -32,7 +33,7 @@ global $check_all_url_open;
 	<label class="screen-reader-text" for="search">Search IP:</label>
 	<input type="search" id="search" name="search" value="<?php echo $_GET['search']; ?>">
 	<input type="submit" name="" id="search-submit" class="button" value="Search IP">
-	<input type="hidden" id="page" name="page" value="wp-IPBLC-list">
+	<input type="hidden" id="page" name="page" value="wp-IPBLC-old-ip">
 	
 </p>
 </form>
@@ -61,6 +62,7 @@ echo "<BR>";
 		$wpdb->query("DELETE FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id='$IP_ID'");
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
 <p><strong>IP Deleted from Blacklist.</strong></p></div>";
+
 $data = array('test' => '1');
 //---post data to ip-finder.me
 $contextData = array ( 
@@ -68,7 +70,6 @@ $contextData = array (
 		'content' => http_build_query($data),
                 'header' => "Connection: close\r\n". 
              "Referer: ".site_url()."\r\n");
-
 
 
 $context = stream_context_create (array ( 'http' => $contextData ));
@@ -99,6 +100,7 @@ $mulitpleDelete=$_GET['delX'];
 		$IPSep=",";		
 		}
 
+
 $data = array('test' => '1');
 //---post data to ip-finder.me
 $contextData = array ( 
@@ -106,7 +108,6 @@ $contextData = array (
 		'content' => http_build_query($data),
                 'header' => "Connection: close\r\n". 
              "Referer: ".site_url()."\r\n");
-
 
 
 $context = stream_context_create (array ( 'http' => $contextData ));
@@ -147,7 +148,7 @@ $post_to_cloud =  file_get_contents (
 
 //--Posts per page
 
-$rowsPerPage = 50;
+$rowsPerPage = 200;
 
 
 
@@ -240,14 +241,16 @@ else if($orderby=="lastvisit")
 
 
 
+	$time=time();
+	$days_90=$time-(90*24*60*60);
 
 
 		if($_GET['search']=="")
 		{
 
-		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order");
+		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist WHERE timestamp<=$days_90 && lastvisit<=$days_90 ORDER BY $orderby $order");
 
-		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
+		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist WHERE  timestamp<=$days_90 && lastvisit<=$days_90 ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
 
 		//$totalIP=count($totalcomments);
 
@@ -256,9 +259,9 @@ else if($orderby=="lastvisit")
 		{
 			$ss=$_GET['search'];
 
-		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP LIKE \"%$ss%\" ORDER BY $orderby $order");
+$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP LIKE \"%$ss%\" AND timestamp<=$days_90 && lastvisit<=$days_90 ORDER BY $orderby $order");
 
-		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist  WHERE IP LIKE \"%$ss%\" ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
+$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist  WHERE IP LIKE \"%$ss%\" AND timestamp<=$days_90 && lastvisit<=$days_90 ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
 
 
 
@@ -275,7 +278,7 @@ else if($orderby=="lastvisit")
 
 	$sss=$_GET['search'];
 
-	$self="?page=wp-IPBLC-list&orderby=$orderby&order=$order&search=$sss";
+	$self="?page=wp-IPBLC-old-ip&orderby=$orderby&order=$order&search=$sss";
 
 		$maxPage = ceil($totalIP/$rowsPerPage);
 
@@ -445,7 +448,7 @@ function deleteMultipleIP(IPs)
 		loc+=sep+IPs[i];
 		sep=",";
 	}
-	window.location.href="?page=wp-IPBLC-list"+loc+"&orderby="+orderby+"&order="+order;
+	window.location.href="?page=wp-IPBLC-old-ip"+loc+"&orderby="+orderby+"&order="+order;
 
 
 }
@@ -465,12 +468,12 @@ function deleteMultipleIP(IPs)
 		<th style="width: 25px;"></th>
 
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort2; ?> <?php echo $order; ?>'  style="text-align: left; width: 50px;">
-<a href="?page=wp-IPBLC-list&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>ID</span><span class="sorting-indicator"></span>
 </a>
 		</th>
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort3; ?> <?php echo $order; ?>'  style="text-align: left;">
-<a href="?page=wp-IPBLC-list&orderby=IP&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=IP&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>IP</span><span class="sorting-indicator"></span>
 </a>
 
@@ -478,14 +481,14 @@ function deleteMultipleIP(IPs)
 		</th>
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 230px;">Details</th>
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 200px;">
-<a href="?page=wp-IPBLC-list&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>Added on</span><span class="sorting-indicator"></span>
 </a>
 
 		</th>
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort4; ?> <?php echo $order; ?>'  style="text-align: left;  width: 180px;">
 
-<a href="?page=wp-IPBLC-list&orderby=visits&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=visits&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>Visited after blocking</span><span class="sorting-indicator"></span>
 </a>
 
@@ -493,7 +496,7 @@ function deleteMultipleIP(IPs)
 		</th>
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort5; ?> <?php echo $order; ?>'  style="text-align: left;  width: 100px;">
 
-<a href="?page=wp-IPBLC-list&orderby=lastvisit&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=lastvisit&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>Last Attack</span><span class="sorting-indicator"></span>
 </a>
 
@@ -516,12 +519,12 @@ function deleteMultipleIP(IPs)
 		<th style="width: 25px;"></th>
 
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort2; ?> <?php echo $order; ?>'  style="text-align: left; width: 50px;">
-<a href="?page=wp-IPBLC-list&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=id&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>ID</span><span class="sorting-indicator"></span>
 </a>
 		</th>
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort3; ?> <?php echo $order; ?>'  style="text-align: left;">
-<a href="?page=wp-IPBLC-list&orderby=IP&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=IP&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>IP</span><span class="sorting-indicator"></span>
 </a>
 
@@ -529,20 +532,20 @@ function deleteMultipleIP(IPs)
 		</th>
 		<th scope='col' id='posts' class='manage-column column-posts num'  style="text-align: left;  width: 230px;">Details</th>
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort1; ?> <?php echo $order; ?>'  style="text-align: left; width: 200px;">
-<a href="?page=wp-IPBLC-list&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=timestamp&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>Added on</span><span class="sorting-indicator"></span>
 </a>
 
 		</th>
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort4; ?> <?php echo $order; ?>'  style="text-align: left;  width: 180px;">
 
-<a href="?page=wp-IPBLC-list&orderby=visits&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=visits&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>Visited after blocking</span><span class="sorting-indicator"></span>
 </a>
 
 		<th scope='col' id='posts' class='manage-column column-posts  <?php echo $sort5; ?> <?php echo $order; ?>'  style="text-align: left;  width: 100px;">
 
-<a href="?page=wp-IPBLC-list&orderby=lastvisit&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
+<a href="?page=wp-IPBLC-old-ip&orderby=lastvisit&order=<?php echo $current_order; ?>&page_num=<?php echo $page_num; ?>&search=<?php echo $sss; ?>">
 <span>Last Attack</span><span class="sorting-indicator"></span>
 </a>
 
@@ -648,7 +651,7 @@ else
 
 <td class="name column-name"><?php echo $visits; ?></td>
 <td class="name column-name"><?php echo $last; ?></td>
-<td class="name column-name"><a href="?page=wp-IPBLC-list&del=<?php echo $this_IP->id; ?>">Delete</a></td>
+<td class="name column-name"><a href="?page=wp-IPBLC-old-ip&del=<?php echo $this_IP->id; ?>">Delete</a></td>
 
 
 

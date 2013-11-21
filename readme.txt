@@ -3,8 +3,8 @@ Contributors: ad33lx
 Donate link: 
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
-Tested up to: 3.5.2
-Stable tag: 2.91
+Tested up to: 3.7.1
+Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,12 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
+
+= 3.0 =
+* Fixes for small bugs.
+* Add a range of IP address for whitelist.
+* Auto Block any IP for specific user login (set list of usernames).
+* Check blacklisted IP addresses that did not attack in last 90 days.
 
 = 2.91 =
 * Quick Fix for 406 error while connecting to ip-finder.me
