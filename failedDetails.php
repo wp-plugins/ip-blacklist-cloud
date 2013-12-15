@@ -1,5 +1,15 @@
 <?php
 
+if ( !defined('ABSPATH') )
+    die ( 'No direct script access allowed' );
+
+
+
+?>
+
+
+<?php
+
 if(!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
 {
 	exit();

@@ -1,3 +1,13 @@
+<?php
+
+if ( !defined('ABSPATH') )
+    die ( 'No direct script access allowed' );
+
+
+
+?>
+
+
 <div class="wrap">
 
 <div id="icon-options-general" class="icon32"><br /></div>  

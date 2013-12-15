@@ -1,5 +1,15 @@
 <?php
 
+if ( !defined('ABSPATH') )
+    die ( 'No direct script access allowed' );
+
+
+
+?>
+
+
+<?php
+
 
 
 global $check_all_url_open;

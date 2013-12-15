@@ -3,8 +3,8 @@ Contributors: ad33lx
 Donate link: 
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
-Tested up to: 3.7.1
-Stable tag: 3.0
+Tested up to: 3.8
+Stable tag: 3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,8 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
+= 3.1 =
+* Fixed Security Exploit in plugin.
 
 = 3.0 =
 * Fixes for small bugs.
