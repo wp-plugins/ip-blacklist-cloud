@@ -17,7 +17,7 @@ if ( !defined('ABSPATH') )
 global $wpdb,$IP_globale,$IP_error,$found;
 
 
-	if($_POST['update_autoblock'])
+	if(isset($_POST['update_autoblock']))
 	{
 
 		update_option('IPBLC_autoblock',$_POST['autoblock']);

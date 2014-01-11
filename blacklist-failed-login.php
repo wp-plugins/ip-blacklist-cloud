@@ -85,8 +85,21 @@ $page_num=$pageNum;
 
 //---------------------------------------------------------------------------------
 
-$orderby=$_GET['orderby'];
-$order=$_GET['order'];
+
+
+$orderby="";
+if(isset($_GET['orderby']))
+{
+	$orderby=$_GET['orderby'];
+}
+
+$order="";
+if(isset($_GET['order']))
+{
+	$order=$_GET['order'];
+}
+
+
 $sort1="sortable";
 $sort2="sortable";
 $sort3="sortable";

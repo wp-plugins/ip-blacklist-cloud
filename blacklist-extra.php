@@ -34,7 +34,7 @@ $dir_this=dirname(__FILE__);
 $dirMain=dirname(dirname(dirname(dirname(__FILE__))));
 
 //echo $dirMain;
-		if($_POST['GenerateblacklistedIP'])
+		if(isset($_POST['GenerateblacklistedIP']))
 		{
 
 		$resultX = $wpdb->get_results( "SELECT DISTINCT(IP) FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY timestamp DESC");

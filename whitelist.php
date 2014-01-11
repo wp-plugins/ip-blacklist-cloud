@@ -6,10 +6,7 @@ if ( !defined('ABSPATH') )
 
 
 ?>
-
-
 <div class="wrap">
-
 <div id="icon-options-general" class="icon32"><br /></div>  
 
 <h2>Whitelist</h2>
@@ -18,7 +15,7 @@ if ( !defined('ABSPATH') )
 global $wpdb,$IP_globale,$IP_error,$found;
 
 
-	if($_POST['update_whitelist'])
+	if(isset($_POST['update_whitelist']))
 	{
 
 		update_option('IPBLC_whitelist',$_POST['whitelist']);
@@ -51,4 +48,3 @@ global $wpdb,$IP_globale,$IP_error,$found;
 </tr>
 </table>
 </div>
-

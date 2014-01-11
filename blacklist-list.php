@@ -4,55 +4,48 @@
 if ( !defined('ABSPATH') )
     die ( 'No direct script access allowed' );
 
+	global $check_all_url_open;
 
+	//echo $check_all_url_open;
 
-global $check_all_url_open;
+	//---start admin options
 
-//echo $check_all_url_open;
-
-
-
-//---start admin options
+		$s_value="";
+		if(isset($_GET['search']))
+		{
+			$s_value=$_GET['search'];
+		}
 
 	?>
-
 <div class="wrap">
-
 <div id="icon-options-general" class="icon32"><br /></div>  
-
 <h2>IP Blacklist</h2>
-
-
-
 <BR>
-
 <B>NOTE:</B> After adding any IP to blacklist, please submit comment on IP-FINDER.ME to help others regarding the issue related to that specific IP.
-
 <BR>
+
 <div style="float: right; right: 8px;">
 <form action="" method="get">
-
 <p class="search-box">
 	<label class="screen-reader-text" for="search">Search IP:</label>
-	<input type="search" id="search" name="search" value="<?php echo $_GET['search']; ?>">
+	<input type="search" id="search" name="search" value="<?php echo $s_value; ?>">
 	<input type="submit" name="" id="search-submit" class="button" value="Search IP">
 	<input type="hidden" id="page" name="page" value="wp-IPBLC-list">
 	
 </p>
 </form>
-
-
 </div>
 
 <BR>
-
 <?php
 
 global $wpdb;
+$IP_ID="";
+if(isset($_GET['del']))
+{
+	$IP_ID=$_GET['del'];
+}
 
-
-
-$IP_ID=$_GET['del'];
 
 
 
@@ -70,21 +63,28 @@ $data = array('test' => '1');
 $contextData = array ( 
                 'method' => 'POST',
 		'content' => http_build_query($data),
-                'header' => "Connection: close\r\n". 
+                'header' => "Connection: close\r\n".
+                "Content-Type: application/x-www-form-urlencoded\r\n".
+ 
              "Referer: ".site_url()."\r\n");
 
 
 
 $context = stream_context_create (array ( 'http' => $contextData ));
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 $post_to_cloud =  file_get_contents (
                   $link,  // page url
                   false,
                   $context);
 	}
 
-$mulitpleDelete=$_GET['delX'];
+$mulitpleDelete="";
+if(isset($_GET['delX']))
+{
+	$mulitpleDelete=$_GET['delX'];
+}
+
 
 	if($mulitpleDelete)
 	{
@@ -109,13 +109,15 @@ $contextData = array (
                 'method' => 'POST',
 		'content' => http_build_query($data),
                 'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
              "Referer: ".site_url()."\r\n");
 
 
 
 $context = stream_context_create (array ( 'http' => $contextData ));
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete_multiple.php?IPx=".$IPData."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete_multiple.php?IPx=".$IPData."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 //echo $link;
 
@@ -134,13 +136,7 @@ $post_to_cloud =  file_get_contents (
 
 
 ?>
-
 <BR><BR>
-
-
-
-
-
 <?php
 
 
@@ -150,11 +146,7 @@ $post_to_cloud =  file_get_contents (
 
 
 //--Posts per page
-
 $rowsPerPage = 50;
-
-
-
 // by default we show first page
 
 $pageNum = 1;
@@ -184,8 +176,18 @@ $page_num=$pageNum;
 
 
 
-$orderby=$_GET['orderby'];
-$order=$_GET['order'];
+$orderby="";
+if(isset($_GET['orderby']))
+{
+	$orderby=$_GET['orderby'];
+}
+
+$order="";
+if(isset($_GET['order']))
+{
+	$order=$_GET['order'];
+}
+
 $sort1="sortable";
 $sort2="sortable";
 $sort3="sortable";
@@ -244,9 +246,10 @@ else if($orderby=="lastvisit")
 
 
 
+		
 
 
-		if($_GET['search']=="")
+		if($s_value=="")
 		{
 
 		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order");
@@ -258,7 +261,7 @@ else if($orderby=="lastvisit")
 		}
 		else
 		{
-			$ss=$_GET['search'];
+			$ss=$s_value;
 
 		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP LIKE \"%$ss%\" ORDER BY $orderby $order");
 
@@ -277,7 +280,7 @@ else if($orderby=="lastvisit")
 
 
 
-	$sss=$_GET['search'];
+	$sss=$s_value;
 
 	$self="?page=wp-IPBLC-list&orderby=$orderby&order=$order&search=$sss";
 
@@ -616,7 +619,7 @@ function deleteMultipleIP(IPs)
 
 <td class="name column-name">
 
-	<a href="http://ip-finder.me/<?php echo $IP; ?>/" target="_blank" title="IP Details on IP-Finder.me">Submit or Read Comments</a>
+	<a href="http://www.ip-finder.me/<?php echo $IP; ?>/" target="_blank" title="IP Details on IP-Finder.me">Submit or Read Comments</a>
 
 </td>
 

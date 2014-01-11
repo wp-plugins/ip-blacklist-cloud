@@ -3,10 +3,11 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
-Version: 3.1
+Version: 3.2
 Author: Adeel Ahmed
-Author URI: http://demo.ip-finder.me/demo-details/
+Author URI: http://www.ip-finder.me/
 */
+
 
 global $check_all_url_open;
 
@@ -52,7 +53,7 @@ function ip_added()
 			);
 
 */
-					$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES('$IP','$time')");
+					$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES('$IP','$time',0,0)");
 
 
 
@@ -125,7 +126,7 @@ function user_added()
 
 */
 
-					$wpdb->query("INSERT INTO $table (USERNAME,timestamp) VALUES('$USER2','$time')");
+					$wpdb->query("INSERT INTO $table (USERNAME,timestamp,visits,lastvisit) VALUES('$USER2','$time',0,0)");
 
 //$wpdb->print_error();
 
@@ -182,7 +183,7 @@ function ip_added_message()
 
 <?php
 
-	echo "<div id=\"IPBLC_message_blacklist\">$IP added to blacklist. Please comment on <a href=\"http://ip-finder.me/wpip?IP=$IP\" target=\"_blank\">IP-FINDER.ME</a></div>";
+	echo "<div id=\"IPBLC_message_blacklist\">$IP added to blacklist. Please comment on <a href=\"http://www.ip-finder.me/wpip?IP=$IP\" target=\"_blank\">IP-FINDER.ME</a></div>";
 
 	}
 	else
@@ -408,6 +409,8 @@ $contextData = array (
                 'method' => 'POST',
 		'content' => http_build_query($data),
 		'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
 		"Referer: ".site_url()."\r\n");
 
  
@@ -419,7 +422,7 @@ $contextData = array (
 
 		$email2=urlencode($IPBLC_cloud_email);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$IPBLC_cloud_key;
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$IPBLC_cloud_key;
 
 
 		$post_to_cloud =  file_get_contents (
@@ -522,12 +525,14 @@ function blacklist_stats()
                 'method' => 'POST',
 		'content' => http_build_query($data),
 		'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
 		"Referer: ".site_url()."\r\n");
 
 
 	$context = stream_context_create (array ( 'http' => $contextData ));
 
- 	$link="http://ip-finder.me/analysis";
+ 	$link="http://www.ip-finder.me/analysis";
 	$analysis =  file_get_contents (
 	$link,
 	false,
@@ -561,11 +566,11 @@ function IPBLC_IP_value( $column, $comment_ID )
 		$IP=get_comment_author_IP($comment_ID);
 		$authorName=get_comment_author($comment_ID);
 
-		echo '<a href="http://ip-finder.me/'.$IP.'/" target="_blank" title="IP Details on IP-Finder.me">'."$IP</a>";
+		echo '<a href="http://www.ip-finder.me/'.$IP.'/" target="_blank" title="IP Details on IP-Finder.me">'."$IP</a>";
 
 		echo '<div class="row-actions">
 	<span class="edit">
-		<a href="http://ip-finder.me/'.$IP.'/" target="_blank" title="IP Details on IP-Finder.me">IP Details</a>
+		<a href="http://www.ip-finder.me/'.$IP.'/" target="_blank" title="IP Details on IP-Finder.me">IP Details</a>
 	</span> | 
 	<span class="edit">';
 
@@ -657,10 +662,10 @@ function create_sql()
 
 		$sql = "CREATE TABLE ".$wpdb->prefix."IPBLC_login_failed (
 		id INT(60) UNSIGNED NOT NULL AUTO_INCREMENT,
-		IP VARCHAR(200) NOT NULL, 
-		useragent VARCHAR(500) NOT NULL, 
+		IP VARCHAR(25) NOT NULL, 
+		useragent VARCHAR( 225 ) NOT NULL, 
 		variables TEXT NOT NULL, 
-		timestamp INT(200) NOT NULL,
+		timestamp INT(30) NOT NULL,
 		UNIQUE KEY id (id)
 		);";
 
@@ -676,9 +681,10 @@ function create_sql()
 
 		$sql = "CREATE TABLE ".$wpdb->prefix."IPBLC_blacklist (
 		id INT(60) UNSIGNED NOT NULL AUTO_INCREMENT,
-		IP VARCHAR(200) NOT NULL, 
-		timestamp VARCHAR(500) NOT NULL,
-		visits INT(255) NOT NULL, 
+		IP VARCHAR(25) NOT NULL, 
+		timestamp INT( 30 ) NOT NULL,
+		visits INT(50) NOT NULL, 
+		lastvisit INT(50) NOT NULL, 
 		UNIQUE KEY id (id)
 		);";
 
@@ -691,9 +697,10 @@ function create_sql()
 
 		$sql = "CREATE TABLE ".$wpdb->prefix."IPBLC_usernames (
 		id INT(60) UNSIGNED NOT NULL AUTO_INCREMENT,
-		USERNAME VARCHAR(250) NOT NULL, 
-		timestamp VARCHAR(500) NOT NULL,
-		visits INT(255) NOT NULL,  
+		USERNAME TEXT NOT NULL, 
+		timestamp INT(30) NOT NULL,
+		visits INT(50) NOT NULL,  
+		lastvisit INT(50) NOT NULL,  
 		UNIQUE KEY id (id)
 		);";
 
@@ -702,11 +709,12 @@ function create_sql()
 	}
 
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE  `USERNAME` `USERNAME` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
+//		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE  `USERNAME` `USERNAME` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
+//		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
+//		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
 
+/*
 
 
 		$checkVisits=$wpdb->get_results("SHOW columns from `".$wpdb->prefix."IPBLC_usernames` where field='visits'");
@@ -764,6 +772,7 @@ function create_sql()
 
 		//---last visit end---
 
+*/
 
 	if(isset($_GET['blacklist']))
 	{
@@ -864,8 +873,10 @@ header("HTTP/1.0 404 Not Found");
 
 
 
-	$author=$_POST['author'];
-
+	$author="";
+	if(isset($_POST['author']))
+	{
+		$author=$_POST['author'];
 	$USER=str_replace("\'","'",$author);
 
 	$USER=str_replace("\\\'","'",$USER);
@@ -921,6 +932,9 @@ header("HTTP/1.0 404 Not Found");
 	<?php
 		exit();
 	}
+	}
+	//----end if isset $_POST['author'];
+
 
 	if(isset($_GET['action']))
 	{
@@ -1403,7 +1417,7 @@ if(isset($_GET['page_num']))
 				$count=$IPData->countx;
 				$timestamp=$IPData->timestamp;
 				$date=date("M d, Y",$timestamp);
-				$link="<a href=\"http://ip-finder.me/$IP\" target=_blank>$IP</a>";
+				$link="<a href=\"http://www.ip-finder.me/$IP\" target=_blank>$IP</a>";
 				$failedID=$IPData->id;
 
 
@@ -1519,7 +1533,7 @@ if(isset($_GET['page_num']))
 			{
 				$table=$wpdb->prefix."IPBLC_blacklist";
 				$time=time();
-				$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES(\"$IP\",\"$time\")");	
+				$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES(\"$IP\",\"$time\",0,0)");	
 
 				 post_blacklist_add($IP);
 
@@ -1576,6 +1590,7 @@ if(isset($_GET['page_num']))
 
 			$where_sql=" WHERE ";
 			$sep="";
+			$sep2="";
 
 			foreach($IPx as $IP)
 			{
@@ -1593,6 +1608,9 @@ if(isset($_GET['page_num']))
 			if($request_IP)
 			{
 
+					//print_r($request_IP);
+					
+
 					post_blacklist_add_multi($request_IP);
 
 
@@ -1607,13 +1625,23 @@ if(isset($_GET['page_num']))
 					$table=$wpdb->prefix."IPBLC_blacklist";
 					$time=time();
 
- $sql ="INSERT INTO $table (IP,timestamp) SELECT * FROM (SELECT \"$IP\", \"$time\") AS tmp WHERE NOT EXISTS (SELECT IP,timestamp FROM $table WHERE IP=\"$IP\")";
+/*					
+ $sql ="INSERT INTO $table (IP,timestamp,visits,lastvisit) SELECT * FROM (SELECT \"$IP\", \"$time\",0,0) AS tmp WHERE NOT EXISTS (SELECT IP,timestamp,visits,lastvisit FROM $table WHERE IP=\"$IP\")";
 
 					//echo $sql."\n";
 
-					$wpdb->query($sql);	
+*/
+					$sql="SELECT IP,timestamp,visits,lastvisit FROM $table WHERE IP=\"$IP\"";
+					$checkX=$wpdb->query($sql);
+					//$wpdb->query($sql);	
+					//print_r($checkX);
 
-
+					if($checkX==0)
+					{
+						$sql="INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES(\"$IP\", \"$time\",0,0)";
+						$wpdb->query($sql);
+					}
+				
 
 					$IPData[]=array("IP"=>$IP,"added"=>1);
 
@@ -1636,7 +1664,7 @@ if(isset($_GET['page_num']))
 			{
 				$table=$wpdb->prefix."IPBLC_blacklist";
 				$time=time();
-				$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES(\"$IP\",\"$time\")");	
+				$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES(\"$IP\",\"$time\",0,0)");	
 
 				// post_blacklist_add($IP);
 
@@ -1711,6 +1739,8 @@ if(isset($_GET['page_num']))
 			                'method' => 'POST',
 					'content' => http_build_query($data),
 					'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
 					"Referer: ".site_url()."\r\n");
 
  
@@ -1718,7 +1748,7 @@ if(isset($_GET['page_num']))
 
 					$context = stream_context_create(array
 					( 'http' => $contextData ));
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));					$post_to_cloud =  file_get_contents (
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));					$post_to_cloud =  file_get_contents (
 			                  $link,  // page url
 			                  false,
 			                  $context);
@@ -1832,7 +1862,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 
 
 
-					$wpdb->query("INSERT INTO $table (USERNAME,timestamp) VALUES('$USER2','$time')");
+					$wpdb->query("INSERT INTO $table (USERNAME,timestamp,visits,lastvisit) VALUES('$USER2','$time',0,0)");
 
 //$wpdb->print_error();
 
@@ -1902,7 +1932,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 				{
 					$table=$wpdb->prefix."IPBLC_blacklist";
 					$time=time();
-					$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES('$IP','$time')");
+					$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES('$IP','$time',0,0)");
 					//$wpdb->print_error();
 
 
@@ -1919,7 +1949,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 
 				if($IP_in_DP)
 				{
-					echo "<b style=\"color: #FF0000;\"> Blacklisted</b> <a href=\"http://ip-finder.me/$IP/\" target=_blank title=\"Leave Comment\">Why?</a>";
+					echo "<b style=\"color: #FF0000;\"> Blacklisted</b> <a href=\"http://www.ip-finder.me/$IP/\" target=_blank title=\"Leave Comment\">Why?</a>";
 				}
 				else
 				{
@@ -2102,7 +2132,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 				$table=$wpdb->prefix."IPBLC_blacklist";
 				$time=time();
 
-					$wpdb->query("INSERT INTO $table (IP,timestamp) VALUES('$IP','$time')");
+					$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES('$IP','$time',0,0)");
 
 					//---post data to ip-finder.me
 					post_blacklist_add($IP);
@@ -2153,7 +2183,7 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?IP=".
 				$table=$wpdb->prefix."IPBLC_usernames";
 				$time=time();
 
-					$wpdb->query("INSERT INTO $table (USERNAME,timestamp) VALUES('$USER','$time')");
+					$wpdb->query("INSERT INTO $table (USERNAME,timestamp,visits,lastvisit) VALUES('$USER','$time',0,0)");
 
 		//---post blacklist data to ip-finder.me
 
@@ -2189,7 +2219,10 @@ $USER_global="";
 $USER_error=false;
 
 add_action('admin_menu', 'page_IPBLC_actions');  
-add_action('admin_init', 'create_sql');  
+add_action('admin_init', 'create_sql');
+add_action( 'admin_notices', 'check_fixes' ); 
+
+
 add_filter( 'manage_edit-comments_columns', 'IPBLC_IP_column' );
 add_filter( 'manage_comments_custom_column', 'IPBLC_IP_value', 10, 2 );
 
@@ -2197,6 +2230,12 @@ add_action('init', 'IPBLC_blockIP');
 
 
 add_action('wp_login_failed','IPBLC_login_failed');
+
+//add_action('comment_unapproved_to_spam', 'auto_blacklist_spam');
+//add_action('comment_approved_to_spam', 'auto_blacklist_spam');
+
+add_action('admin_init', 'auto_blacklist_spam_multi');
+
 
 function IPBLC_login_failed(){
 
@@ -2217,7 +2256,7 @@ function IPBLC_login_failed(){
 
     if($isIPSafe==0)
     {
-	if($_POST)
+	if(isset($_POST))
 	{
 		foreach($_POST as $k=>$v)
 		{
@@ -2272,7 +2311,7 @@ function IPBLC_login_failed(){
 		//echo "BLOCK!!<BR>";
 		$time=time();
 		$table2=$wpdb->prefix."IPBLC_blacklist";
-		$wpdb->query("INSERT INTO $table2 (IP,timestamp) VALUES('$visitorIP','$time')");
+		$wpdb->query("INSERT INTO $table2 (IP,timestamp,visits,lastvisit) VALUES('$visitorIP','$time',0,0)");
 
 		post_blacklist_add($visitorIP);
 
@@ -2319,12 +2358,9 @@ function IPBLC_login_failed(){
 		if($attempts>=$IPBLC_failedlogin_max)
 		{
 			$table2=$wpdb->prefix."IPBLC_blacklist";
-			$wpdb->query("INSERT INTO $table2 (IP,timestamp) VALUES('$visitorIP','$time')");
-
-
+			$wpdb->query("INSERT INTO $table2 (IP,timestamp,visits,lastvisit) VALUES('$visitorIP','$time',0,0)");
 
 				post_blacklist_add($visitorIP);
-
 
 				if($IPBLC_failedlogin_email)
 				{
@@ -2380,7 +2416,7 @@ function load_custom_IPBLC_admin_style()
 
 function IPJS()
 {
-	if($_GET['blacklist'])
+	if(isset($_GET['blacklist']))
 	{
 		//print_r($_SERVER);
 		$referer=$_SERVER['HTTP_REFERER'];
@@ -2394,7 +2430,7 @@ function IPJS()
 	}
 
 
-	elseif($_GET['blacklistuser'])
+	elseif(isset($_GET['blacklistuser']))
 	{
 		//print_r($_SERVER);
 		$referer=$_SERVER['HTTP_REFERER'];
@@ -2411,7 +2447,13 @@ function IPJS()
 
 
 	$scriptname=$_SERVER['SCRIPT_NAME'];
-	$page=$_GET['page'];
+	$page="";
+
+		if(isset($_GET['page']))
+		{
+			$page=$_GET['page'];
+
+		}
 
 ?>
 <script type="text/javascript">
@@ -2466,12 +2508,12 @@ function protected_comment_link()
 	if($IPBLC_protected=="2")
 	{
 
-	echo "Protected with <a href=\"http://ip-finder.me\"><img src=\"".plugins_url()."/ip-blacklist-cloud/icon.png\" style=\"display: inline;\" alt=\"IP Blacklist Cloud\"></a><a href=\"http://ip-finder.me\" title=\"IP Blacklist Cloud\">IP Blacklist Cloud</a>";
+	echo "Protected with <a href=\"http://www.ip-finder.me\"><img src=\"".plugins_url()."/ip-blacklist-cloud/icon.png\" style=\"display: inline;\" alt=\"IP Blacklist Cloud\"></a><a href=\"http://www.ip-finder.me\" title=\"IP Blacklist Cloud\">IP Blacklist Cloud</a>";
 
 	}
 	else
 	{
-		echo "<div style=\"display: none;\">Protected with <a href=\"http://ip-finder.me\" title=\"IP Blacklist Cloud\">IP Blacklist Cloud</a></div>";
+		echo "<div style=\"display: none;\">Protected with <a href=\"http://www.ip-finder.me\" title=\"IP Blacklist Cloud\">IP Blacklist Cloud</a></div>";
 	}
 
 }
@@ -2563,6 +2605,8 @@ $contextData = array (
                 'method' => 'POST',
 		'content' => http_build_query($data),
 		'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
 		"Referer: ".site_url()."\r\n");
 
  
@@ -2570,7 +2614,7 @@ $contextData = array (
 
 		$email2=urlencode($IPBLC_cloud_email);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$IPBLC_cloud_key;
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$IPBLC_cloud_key;
 
 
 		$post_to_cloud =  file_get_contents (
@@ -2792,6 +2836,8 @@ $contextData = array (
                 'method' => 'POST',
 		'content' => http_build_query($data),
 		'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
 		"Referer: ".site_url()."\r\n");
 
  
@@ -2799,7 +2845,7 @@ $contextData = array (
 // Create context resource for our request
 
 $context = stream_context_create (array ( 'http' => $contextData ));
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_add.php?IP=".$IP."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 $post_to_cloud =  file_get_contents (
                   $link,  // page url
@@ -2841,6 +2887,8 @@ $contextData = array (
                 'method' => 'POST',
 		'content' => http_build_query($data),
 		'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
 		"Referer: ".site_url()."\r\n");
 
  
@@ -2848,18 +2896,13 @@ $contextData = array (
 // Create context resource for our request
 
 $context = stream_context_create (array ( 'http' => $contextData ));
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_add_multi.php?IP=".$IP_var."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_add_multi.php?IP=".$IP_var."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 
 $post_to_cloud =  file_get_contents (
                   $link,  // page url
                   false,
                   $context);
-
-
-//	echo "return: $post_to_cloud";
-
-
 }
 
 }
@@ -2879,6 +2922,8 @@ $contextData = array (
                 'method' => 'POST',
 		'content' => http_build_query($data),
 		'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
 		"Referer: ".site_url()."\r\n");
 
  
@@ -2887,7 +2932,7 @@ $contextData = array (
 
 $context = stream_context_create (array ( 'http' => $contextData ));
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$user."&website=".
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_user_add.php?USER=".$user."&website=".
 urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 $post_to_cloud =  file_get_contents (
@@ -2896,4 +2941,122 @@ $post_to_cloud =  file_get_contents (
                   $context);
 
 }
+
+
+function check_fixes()
+{
+	$IPBLC_fix=get_option('IPBLC_fixes');
+
+	if($IPBLC_fix=="")
+	{
+
+?>
+	<div class="error">
+		<p><h4 style="color: #FF0000;">Action Required by IP Blacklist Cloud Plugin!</h4>
+		<b>Please check <a href="admin.php?page=wp-IPBLC-fixes">fixes</a> page for database issues.</b></p>
+	</div>
+<?php
+	}
+
+}
+
+
+function auto_blacklist_spam($comment_object)
+{
+	global $wpdb;
+
+	$IP=$comment_object->comment_author_IP;
+
+	$table=$wpdb->prefix."IPBLC_blacklist";
+	$time=time();
+
+	$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
+
+	$found=false;
+
+//	print_r($IP_in_DP);
+
+	if(!$IP_in_DP)
+	{
+
+		if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+		{
+//			echo "$IP"."\n";
+
+			$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES('$IP','$time',0,0)");
+
+			post_blacklist_add($IP);
+
+
+		}
+	}	
+}
+
+function auto_blacklist_spam_multi()
+{
+	global $wpdb;
+
+	$table=$wpdb->prefix."IPBLC_blacklist";
+	$time=time();
+
+	$IPs=array();
+
+
+		$action1="";
+		$action2="";
+		
+		if(isset($_GET['action']))
+		{
+			$action1=$_GET['action'];
+		}
+		
+		if(isset($_GET['action2']))
+		{
+			$action2=$_GET['action2'];
+		}
+
+
+	if($action1 || $action2)
+	{
+		if($action1=="spam" || $action2=="spam")
+		{
+			if(isset($_GET['delete_comments']))
+			{
+				$comments=$_GET['delete_comments'];
+
+
+				foreach($comments as $commentID)
+				{
+					$commentX=get_comment( $commentID );
+					//print_r($commentX);
+					$IP=$commentX->comment_author_IP;
+
+					$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
+
+					if(!$IP_in_DP)
+					{
+						$IPs[]=$IP;
+					}
+
+				}
+
+				if($IPs)
+				{
+					$IPs=array_unique($IPs);
+					foreach($IPs as $IP)
+					{
+						$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES('$IP','$time',0,0)");
+
+					}
+					post_blacklist_add_multi($IPs);
+
+				}
+
+			}
+		}
+
+	}
+}
+
+
 ?>

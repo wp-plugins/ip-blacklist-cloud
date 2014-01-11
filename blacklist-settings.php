@@ -40,7 +40,7 @@ global $wpdb;
 		update_option('IPBLC_cloud_key',"");
 
 
-	if($_POST['update_IPBLC'])
+	if(isset($_POST['update_IPBLC']))
 	{
 
 		update_option('IPBLC_auto_comments',$_POST['auto_comments']);
@@ -72,6 +72,8 @@ global $wpdb;
 		$contextData = array ( 
 		'method' => 'POST',
 		'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
 		"Referer: ".site_url()."\r\n"); 
 
 		$context = stream_context_create (array ( 'http' => $contextData ));
@@ -80,7 +82,7 @@ global $wpdb;
 		$email2=urlencode($cloudemail);
 		$cloudkey2=urlencode($cloudkey);
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$cloudkey2;
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$cloudkey2;
 
 
 		$post_to_cloud =  file_get_contents (
@@ -227,11 +229,14 @@ $link="http://ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?em
 
 <tr valign="top">
 <td>
-<b>Show "<?php  echo "Protected with <a href=\"http://ip-finder.me\"><img src=\"".plugins_url()."/ip-blacklist-cloud/icon.png\" style=\"display: inline;\">IP Blacklist Cloud</a>"; ?>" message below comments form:</b> 
+<b>Show "<?php  echo "Protected with <a href=\"http://www.ip-finder.me\"><img src=\"".plugins_url()."/ip-blacklist-cloud/icon.png\" style=\"display: inline;\">IP Blacklist Cloud</a>"; ?>" message below comments form:</b> 
 </td>
 <td>
 <select id="IPBLC_protected" name="IPBLC_protected"  style="width: 80px;">
 <?php
+$optioni_1="";
+$optioni_2="";
+
 if($IPBLC_protected=="1")
 {
 $optioni_1="selected";
@@ -258,6 +263,9 @@ $optioni_2="selected";
 <td>
 <select id="IPBLC_failed_sort_status" name="IPBLC_failed_sort_status"  style="width: 80px;">
 <?php
+$optioni1_1="";
+$optioni1_2="";
+
 if($IPBLC_failed_sort_status=="")
 {
 $optioni1_1="selected";
@@ -337,7 +345,7 @@ Send Email on Auto Block:
 
 <h3>Import/Export Blacklisted IP and Usernames Database</h3>
 <div id="setting-error-settings_updated" class="updated settings-error below-h2" style="color: #FF0000;">
-<b><a href="http://ip-finder.me/ipblc-server/" target=_blank style="color: red">Tired of importing / exporting among your websites? Get IP Blacklist Cloud Server!</div>
+<b><a href="http://www.ip-finder.me/ipblc-server/" target=_blank style="color: red">Tired of importing / exporting among your websites? Get IP Blacklist Cloud Server!</div>
 </a></b>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 550px;">
@@ -361,7 +369,8 @@ Import:
 <td>
 <?php
 		
-if(!$_FILES['importCSV'])
+
+if(!isset($_FILES['importCSV']))
 {
 
 ?>
@@ -657,7 +666,7 @@ function submitToDBUsername(username)
 <BR><BR>
 <div id="setting-error-settings_updated" class="updated settings-error below-h2" style="color: #FF0000;">
 
-<b><a href="http://ip-finder.me/ipblc-server/" target=_blank  style="color: red">What is IP Blacklist Cloud Server?</a></b>
+<b><a href="http://www.ip-finder.me/ipblc-server/" target=_blank  style="color: red">What is IP Blacklist Cloud Server?</a></b>
 </div>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 650px;">

@@ -3,8 +3,6 @@
 if ( !defined('ABSPATH') )
     die ( 'No direct script access allowed' );
 
-
-
 ?>
 
 
@@ -30,7 +28,12 @@ global $wpdb;
 
 
 
-$USER_ID=$_GET['del'];
+$USER_ID="";
+if(isset($_GET['del']))
+{
+	$USER_ID=$_GET['del'];
+}
+
 
 
 
@@ -60,6 +63,8 @@ $contextData = array (
                 'method' => 'POST',
 		'content' => http_build_query($data),
                 'header' => "Connection: close\r\n". 
+                        "Content-Type: application/x-www-form-urlencoded\r\n".
+
              "Referer: ".site_url()."\r\n");
 
 
@@ -76,7 +81,7 @@ $context = stream_context_create (array ( 'http' => $contextData ));
 $USER2=urlencode($USER);
 
 
-$link="http://ip-finder.me/wp-content/themes/ipfinder/blacklist_delete_user.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
+$link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete_user.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
 
 $post_to_cloud =  file_get_contents (
 
@@ -136,8 +141,20 @@ $page_num=$pageNum;
 //---------------------------------------------------------------------------------
 
 
-$orderby=$_GET['orderby'];
-$order=$_GET['order'];
+
+$orderby="";
+if(isset($_GET['orderby']))
+{
+	$orderby=$_GET['orderby'];
+}
+
+$order="";
+if(isset($_GET['order']))
+{
+	$order=$_GET['order'];
+}
+
+
 $sort1="sortable";
 $sort2="sortable";
 $sort3="sortable";
@@ -460,7 +477,7 @@ $xyzzz=$pageNum+10;
 
 <td class="name column-name">
 
-	<a href="http://ip-finder.me/wpuser?user=<?php echo $USER2; ?>" target="_blank" title="IP Details on IP-Finder.me">Details on IP Blacklist Cloud</a>
+	<a href="http://www.ip-finder.me/wpuser?user=<?php echo $USER2; ?>" target="_blank" title="IP Details on IP-Finder.me">Details on IP Blacklist Cloud</a>
 
 </td>
 
