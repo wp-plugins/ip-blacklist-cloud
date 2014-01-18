@@ -91,7 +91,6 @@ http://demo.ip-finder.me/demo-details/
 
 == Changelog ==
 
-
 = 3.2 =
 * Automatically Blacklist mulitple IP addresses for spam comments (mark as spam from dropdown)
 * Fixed PHP and Database Errors.
