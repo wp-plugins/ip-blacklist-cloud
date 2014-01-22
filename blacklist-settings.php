@@ -43,8 +43,8 @@ global $wpdb;
 	if(isset($_POST['update_IPBLC']))
 	{
 
-		update_option('IPBLC_auto_comments',$_POST['auto_comments']);
-		update_option('IPBLC_protected',$_POST['IPBLC_protected']);
+		//update_option('IPBLC_auto_comments',$_POST['auto_comments']);
+		//update_option('IPBLC_protected',$_POST['IPBLC_protected']);
 		update_option('IPBLC_failed_sort_status',$_POST['IPBLC_failed_sort_status']);
 
 
@@ -53,89 +53,8 @@ global $wpdb;
 		//$cloudkey=$_POST['cloud_key'];
 
 
-		$cloudemail="";
-		$cloudkey="";
-
-		if($cloudemail=="" && $cloudkey=="")
-		{
-		update_option('IPBLC_cloud_email',"");
-		update_option('IPBLC_cloud_key',"");
-		}
-
-		if($cloudemail && $cloudkey)
-		{
-			if(filter_var($cloudemail, FILTER_VALIDATE_EMAIL))
-			{
-
-		//---post blacklist data to ip-finder.me
-
-		$contextData = array ( 
-		'method' => 'POST',
-		'header' => "Connection: close\r\n". 
-                        "Content-Type: application/x-www-form-urlencoded\r\n".
-
-		"Referer: ".site_url()."\r\n"); 
-
-		$context = stream_context_create (array ( 'http' => $contextData ));
-
-
-		$email2=urlencode($cloudemail);
-		$cloudkey2=urlencode($cloudkey);
-
-$link="http://www.ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.php?email=$email2&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'))."&cloudkey=".$cloudkey2;
-
-
-		$post_to_cloud =  file_get_contents (
-		$link,
-		false,
-		$context);
-
-		//echo $post_to_cloud;
-
-
-		if($post_to_cloud=="-1")
-		{
-		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
-<p><strong>Invalid email address or cloudkey for Cloud Account.</strong></p></div>";
-		}
-		elseif($post_to_cloud=="-2")
-		{
-			
-		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
-<p><strong>Your Cloud Account has expired.</strong></p></div>";
-
-
-		}
-		elseif($post_to_cloud)
-		{
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
 <p><strong>Settings saved.</strong></p></div>";
-
-		update_option('IPBLC_cloud_email',$cloudemail);
-		update_option('IPBLC_cloud_key',$cloudkey);
-
-		}
-
-				
-				
-
-			}
-			else
-			{
-		echo "<div id='setting-error-settings_updated' class='error settings-error'> 
-<p><strong>Invalid Email format.</strong></p></div>";
-
-
-			}
-
-		}
-		else
-		{
-		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
-<p><strong>Settings saved.</strong></p></div>";
-		}
-
-
 
 	}
 
@@ -166,24 +85,14 @@ $link="http://www.ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.ph
 	}
 
 
-
-	$IPBLC_auto_comments=get_option('IPBLC_auto_comments');
-	if(!$IPBLC_auto_comments)
-	{
-		update_option('IPBLC_auto_comments','2');
-		$IPBLC_auto_comments=get_option('IPBLC_auto_comments');
-	}
-
+/*
 	$IPBLC_protected=get_option('IPBLC_protected');
 	if(!$IPBLC_protected)
 	{
 		update_option('IPBLC_protected','2');
 		$IPBLC_protected=get_option('IPBLC_protected');
 	}
-
-
-	$IPBLC_cloud_email=get_option('IPBLC_cloud_email');
-	$IPBLC_cloud_key=get_option('IPBLC_cloud_key');
+*/
 
 
 
@@ -224,9 +133,15 @@ $link="http://www.ip-finder.me/wp-content/themes/ipfinder/cloudaccount_status.ph
 <form method="post" ENCTYPE="multipart/form-data">
 <h3>Settings</h3>
 
+<div class="updated settings-error below-h2">
+<b style="color: #FF0000;">NOTE:</b> If <i style="color: #000099;">Allow "Sort by IP status" in failed login page</i> is set to YES and does not show any data in "Failed Login" page, please set this option to NO.</b><BR>
+</div>
+
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 650px;">
 
-
+<?php
+/*
+?>
 <tr valign="top">
 <td>
 <b>Show "<?php  echo "Protected with <a href=\"http://www.ip-finder.me\"><img src=\"".plugins_url()."/ip-blacklist-cloud/icon.png\" style=\"display: inline;\">IP Blacklist Cloud</a>"; ?>" message below comments form:</b> 
@@ -254,7 +169,9 @@ $optioni_2="selected";
 </select>
 </td>
 </tr>
-
+<?php
+*/
+?>
 
 <tr valign="top">
 <td>
@@ -293,7 +210,6 @@ $optioni1_2="selected";
 </tr>
 </table>
 </form>
-<b style="color: #FF0000;">NOTE: If <i style="color: #000099;">Allow "Sort by IP status" in failed login page</i> is set to YES and does not show any data in "Failed Login" page, please set this option to NO.</b><BR>
 
 
 
@@ -327,7 +243,8 @@ Time limit for maximum attempts (minutes):
 Send Email on Auto Block: 
 </td>
 <td>
-<input type="input" name="IPBLC_failedlogin_email" id="IPBLC_failedlogin_email" value="<?php echo $IPBLC_failedlogin_email; ?>" class="regular-text" style="width: 180px;"> <small>(Leave blank if you don't want email.)</small>
+<input type="input" name="IPBLC_failedlogin_email" id="IPBLC_failedlogin_email" value="<?php echo $IPBLC_failedlogin_email; ?>" class="regular-text" style="width: 180px;"><BR>
+<small>(Leave blank if you don't want email.)</small>
 
 </td>
 </tr>
@@ -344,9 +261,8 @@ Send Email on Auto Block:
 
 
 <h3>Import/Export Blacklisted IP and Usernames Database</h3>
-<div id="setting-error-settings_updated" class="updated settings-error below-h2" style="color: #FF0000;">
-<b><a href="http://www.ip-finder.me/ipblc-server/" target=_blank style="color: red">Tired of importing / exporting among your websites? Get IP Blacklist Cloud Server!</div>
-</a></b>
+<div class="updated settings-error below-h2">
+<b>Tired of importing / exporting among your websites? Get <a href="http://www.ip-finder.me/ipblc-server/" target=_blank style="color: red">IP Blacklist Cloud Server</a> Now!</b></div>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 550px;">
 
@@ -664,9 +580,9 @@ function submitToDBUsername(username)
 <BR><b>Note: If you have purchased IP Cloud Server and it is running, turn on "Connect to Cloud" option and set password for this website.</b><BR>
 
 <BR><BR>
-<div id="setting-error-settings_updated" class="updated settings-error below-h2" style="color: #FF0000;">
+<div id="setting-error-settings_updated" class="updated settings-error below-h2">
 
-<b><a href="http://www.ip-finder.me/ipblc-server/" target=_blank  style="color: red">What is IP Blacklist Cloud Server?</a></b>
+<b>What is <a href="http://www.ip-finder.me/ipblc-server/" target=_blank  style="color: red">IP Blacklist Cloud Server</a>?</b>
 </div>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 650px;">

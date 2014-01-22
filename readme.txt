@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 3.8
-Stable tag: 3.2
+Stable tag: 3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,11 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 3.3 =
+* Fixed minor PHP Errors
+* Fixed auto blacklist if "spam" link is clicked for single comment. 
+* Protected with IP Blacklist Cloud will be displayed with comment form (no more ON / OFF settings).
 
 = 3.2 =
 * Automatically Blacklist mulitple IP addresses for spam comments (mark as spam from dropdown)

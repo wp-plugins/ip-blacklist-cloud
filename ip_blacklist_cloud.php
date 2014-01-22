@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
-Version: 3.2
+Version: 3.3
 Author: Adeel Ahmed
 Author URI: http://www.ip-finder.me/
 */
@@ -550,7 +550,7 @@ function IPBLC_IP_column( $columns )
 {
 
 	$columns['IPBLC_IP'] = __( 'Details' );
-	$columns['IPBLC_IP_status'] = __( 'Staus' );
+	$columns['IPBLC_IP_status'] = __( 'Status' );
 	$columns['IPBLC_IP_spam'] = __( 'Spam Percentage' );
 	return $columns;
 }
@@ -828,6 +828,37 @@ function IPBLC_blockip()
 {
 
 	global $wpdb;
+
+	//---check last update with ip-finder.me site--
+		$time=time();
+		$lastU=get_option('IPBLC_last_update');
+
+		$diff=$time-$lastU;
+
+		//---send website link to ip-finder.me after every 2 days. (verification of data)
+		if($diff>172800)
+		{
+			update_option('IPBLC_last_update',$time);
+
+			$data = array('test' => '1');
+
+
+			$contextData = array ( 
+		                'method' => 'POST',
+				'content' => http_build_query($data),
+				'header' => "Connection: close\r\n". 
+	                        "Content-Type: application/x-www-form-urlencoded\r\n".
+					"Referer: ".site_url()."\r\n");
+
+			$context = stream_context_create(array( 'http' => $contextData ));
+$link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
+					$post_to_cloud =  file_get_contents (
+			                  $link,  // page url
+			                  false,
+			                  $context);
+		}
+	//--- END -- check last update with ip-finder.me site--
+
 
 	$IP=$_SERVER['REMOTE_ADDR'];
 	$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
@@ -2504,17 +2535,21 @@ jQuery(".IPSpamAction").click(function(){
 
 function protected_comment_link()
 {
+/*
 	$IPBLC_protected=get_option('IPBLC_protected');
 	if($IPBLC_protected=="2")
 	{
+*/
 
 	echo "Protected with <a href=\"http://www.ip-finder.me\"><img src=\"".plugins_url()."/ip-blacklist-cloud/icon.png\" style=\"display: inline;\" alt=\"IP Blacklist Cloud\"></a><a href=\"http://www.ip-finder.me\" title=\"IP Blacklist Cloud\">IP Blacklist Cloud</a>";
 
+/*
 	}
 	else
 	{
 		echo "<div style=\"display: none;\">Protected with <a href=\"http://www.ip-finder.me\" title=\"IP Blacklist Cloud\">IP Blacklist Cloud</a></div>";
 	}
+*/
 
 }
 
@@ -3004,22 +3039,38 @@ function auto_blacklist_spam_multi()
 
 		$action1="";
 		$action2="";
+		$sp="";
 		
 		if(isset($_GET['action']))
 		{
 			$action1=$_GET['action'];
 		}
 		
+		if(isset($_POST['action']))
+		{
+			$action1=$_POST['action'];
+		}
+		
 		if(isset($_GET['action2']))
 		{
 			$action2=$_GET['action2'];
 		}
+		if(isset($_POST['action2']))
+		{
+			$action2=$_POST['action2'];
+		}
+		if(isset($_POST['spam']))
+		{
+			$sp=$_POST['spam'];
+		}
+
 
 
 	if($action1 || $action2)
 	{
-		if($action1=="spam" || $action2=="spam")
+		if($action1=="spam" || $action2=="spam" || ($action1=="delete-comment" && $sp==1)  || ($action2=="delete-comment" && $sp==1) )
 		{
+
 			if(isset($_GET['delete_comments']))
 			{
 				$comments=$_GET['delete_comments'];
@@ -3053,10 +3104,89 @@ function auto_blacklist_spam_multi()
 				}
 
 			}
+			elseif(isset($_POST['id']))
+			{
+					$commentX=get_comment( $_POST['id'] );
+					//print_r($commentX);
+					$IP=$commentX->comment_author_IP;
+
+					$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
+
+					if(!$IP_in_DP)
+					{
+						$IPs[]=$IP;
+					}
+
+				if($IPs)
+				{
+					$IPs=array_unique($IPs);
+					foreach($IPs as $IP)
+					{
+						$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES('$IP','$time',0,0)");
+
+					}
+					post_blacklist_add_multi($IPs);
+
+				}
+			}
 		}
 
 	}
 }
 
+
+function ipblc_notice()
+{
+	global $pagenow;
+	$msg_array=array();
+	$msg_array[]='Manage multiple WordPress sites with <a href="http://www.ip-finder.me/ipblc-server/">IPBLC Cloud Server</a> premium tool.';
+	$msg_array[]='Tired of blocking same IP on multiple sites? <a href="http://www.ip-finder.me/ipblc-server/">IPBLC Cloud Server</a> is a solution.';
+	$msg_array[]='<a href="http://www.ip-finder.me/ipblc-server/">IPBLC Cloud Server</a> - Synchronize IP addresses on multiple sites.';
+
+	$show=0;
+	if($pagenow == 'edit-comments.php')
+	{
+		$show=1;
+			//---set emptry array---
+			$start=0;
+			$end=15;
+			for($i=$start;$i<=$end;$i++)
+			{
+				$msg_array[]="";
+			}
+
+			echo '<div class="error mob_error"><p><b>IP Blacklist</b> - Columns visibility problem on mobile.</p></div>';
+?>
+<style>
+@media screen and (min-width: 782px)
+{
+	.mob_error
+	{
+		display: none;
+	}
+}
+</style>
+<?php
+	}
+	elseif($pagenow == 'admin.php')
+	{
+		if(isset($_GET['page']))
+		{
+			if($_GET['page']=="wp-IPBLC-list" || $_GET['page']=="wp-IPBLC-Add")
+			{
+				$show=1;
+			}
+		}
+	}
+
+	$rand=array_rand($msg_array,2);
+	$msg=$msg_array[$rand[0]];
+
+	if($show==1 && $msg!="")
+	{
+		echo '<div class="updated"><p><b>'.$msg.'</b></p></div>';
+	}
+}
+add_action('admin_notices', 'ipblc_notice');
 
 ?>
