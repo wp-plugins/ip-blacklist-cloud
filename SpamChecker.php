@@ -48,7 +48,34 @@ $comment_website=site_url();
 
 $comment_author_website=$commentData->comment_author_url;
 
-if($comment_author!="admin")
+//-----get user info and find if is admin or not-----
+
+	$this_user_admin=0;
+
+	$this_user_data=get_user_by( 'login', $comment_author );
+	$this_user_id="";
+
+	if(!$this_user_data)
+	{
+		$this_user_data=get_user_by( 'slug', $comment_author );
+	}
+
+	if(isset($this_user_data->id))
+	{
+		$this_user_id=$this_user_data->id;
+	}
+
+	if($this_user_id>0)
+	{
+		if(is_super_admin( $this_user_id ))
+		{
+			$this_user_admin=1;
+		}
+	}
+
+//----END get user info and find if is admin or not-----
+
+if($this_user_admin==0)
 {
 
 $url="http://www.ip-finder.me/spamcheck3/";
@@ -80,7 +107,7 @@ curl_close($handle);
 }
 else
 {
-	echo "no reports for admin";
+	echo "no reports for administrator";
 }
 
 
