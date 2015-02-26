@@ -4,6 +4,7 @@ if ( !defined('ABSPATH') )
     die ( 'No direct script access allowed' );
 
 
+global $this_plugin_url;
 
 ?>
 
@@ -28,10 +29,8 @@ global $wpdb;
 
 
 
-
-$dir_this=dirname(__FILE__);
-
-$dirMain=dirname(dirname(dirname(dirname(__FILE__))));
+$dirMain=get_home_path()."/";
+$dirMain=str_replace("//","/",$dirMain);
 
 //echo $dirMain;
 		if(isset($_POST['GenerateblacklistedIP']))
@@ -48,9 +47,9 @@ $dirMain=dirname(dirname(dirname(dirname(__FILE__))));
 				$fileData.="$IP\n";
 			}
 
-			file_put_contents($dirMain."/blacklistedIP.txt",$fileData);
+			file_put_contents($dirMain."blacklistedIP.txt",$fileData);
 
-			if(file_exists($dirMain."/blacklistedIP.txt"))
+			if(file_exists($dirMain."blacklistedIP.txt"))
 			{
 			echo "<div id='setting-error-settings_updated' class='updated settings-error'>
 				<p><strong>blacklistedIP.txt updated successfully!
@@ -96,7 +95,7 @@ Because plugins runs within WordPress framework and before IP Blacklist Cloud pl
 
 <BR>
 <center>
-<img src="<?php echo plugins_url()."/ip-blacklist-cloud/extra_1.png"; ?>">
+<img src="<?php echo $this_plugin_url."extra_1.png"; ?>">
 </center>
 
 <BR>
@@ -108,7 +107,7 @@ I have created a premium script (standalone) which works best with <b>IP Blackli
 <b>How script works?</b><BR><BR>
 Scripts runs between WordPress and visitors that means, script runs first and check if IP is blacklisted or not and if IP address is neutral (not Blacklisted) only then WordPress runs.<BR><BR>
 <center>
-<img src="<?php echo plugins_url()."/ip-blacklist-cloud/extra_2.png"; ?>">
+<img src="<?php echo $this_plugin_url."extra_2.png"; ?>">
 </center>
 
 
@@ -128,7 +127,10 @@ Script consist of two files.<BR>
 <i style="color: #0000FF; "><b>checkIP.php</b></i> checks visitor IP in file <i style="color: #0000FF; "><b>blacklistedIP.txt</b></i> and if it is blacklisted, it shows message from <i style="color: #0000FF; "><b>customMessage.php</b></i> and does not allow WordPress to run.<BR>
 <BR>
 
-<BR>You can purchase this script for <b>U.S $5.0</b> but you must have <a href="https://www.moneybookers.com/app/" target=_blank>Skrill (moneybookers)</a> account. Please contact me first at: <b>contact@adiie9.com</b> 
+
+<div id="setting-error-settings_updated" class="updated settings-error" style="background: #FFDDDD;">
+				<p>You can purchase this script for <b>U.S $5.0</b> via PayPal. Please contact me first at: <b>contact@adiie9.com</b> or <b>ad33l@live.com</b> before making payment.</p></div>
+
 
 
 <h3>Script Setup</h3>

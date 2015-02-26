@@ -18,13 +18,17 @@ global $wpdb,$IP_globale,$IP_error,$found;
 	if(isset($_POST['update_whitelist']))
 	{
 
-		update_option('IPBLC_whitelist',$_POST['whitelist']);
+		$white=sanitize_text_field(mysql_real_escape_string($_POST['whitelist']));
+
+
+		update_option('IPBLC_whitelist',$white);
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
 <p><strong>Whitelist Updated!</strong></p></div>";
 
 	}
 
 	$IPBLC_whitelist=get_option('IPBLC_whitelist');
+	$IPBLC_whitelist=str_replace('\r\n',"\r\n",$IPBLC_whitelist);
 
 ?>
 

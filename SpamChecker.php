@@ -1,9 +1,5 @@
 <?php 
 
-$dirname=dirname(dirname(dirname(dirname(__FILE__))));
-include $dirname."/wp-config.php";
-
-
 if ( !defined('ABSPATH') )
     die ( 'No direct script access allowed' );
 
@@ -82,5 +78,5 @@ else
 	echo "no reports for admin";
 }
 
-
+exit();
 ?>	

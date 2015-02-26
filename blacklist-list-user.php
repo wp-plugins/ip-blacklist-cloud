@@ -31,23 +31,24 @@ global $wpdb;
 $USER_ID="";
 if(isset($_GET['del']))
 {
-	$USER_ID=$_GET['del'];
+	$USER_ID=sanitize_text_field(mysql_real_escape_string($_GET['del']));
 }
 
 
 
 
-	if($USER_ID)
+	if($USER_ID && is_numeric($USER_ID))
 	{
 
 
 
-		$USER=$wpdb->get_var("SELECT USERNAME FROM ".$wpdb->prefix."IPBLC_usernames WHERE id='$USER_ID'");
+		$USER=$wpdb->get_var($wpdb->prepare("SELECT USERNAME FROM ".$wpdb->prefix."IPBLC_usernames WHERE id=%d",$USER_ID));
 
 
-
-		$wpdb->query("DELETE FROM ".$wpdb->prefix."IPBLC_usernames WHERE id='$USER_ID'");
-
+		if($USER)
+		{
+			$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."IPBLC_usernames WHERE id=%d",$USER_ID));
+		}
 
 
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
@@ -78,7 +79,7 @@ $context = stream_context_create (array ( 'http' => $contextData ));
 
 // Read page rendered as result of your POST request
 
-$USER2=urlencode($USER);
+$USER2=urlencode(sanitize_text_field(mysql_real_escape_string($USER)));
 
 
 $link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete_user.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
@@ -142,17 +143,19 @@ $page_num=$pageNum;
 
 
 
+
 $orderby="";
 if(isset($_GET['orderby']))
 {
-	$orderby=$_GET['orderby'];
+	$orderby=sanitize_text_field(mysql_real_escape_string($_GET['orderby']));
 }
 
 $order="";
 if(isset($_GET['order']))
 {
-	$order=$_GET['order'];
+	$order=sanitize_text_field(mysql_real_escape_string($_GET['order']));
 }
+
 
 
 $sort1="sortable";
@@ -216,9 +219,9 @@ else if($orderby=="visits")
 
 
 
-		$totalUSER = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_usernames ORDER BY $orderby $order");
+		$totalUSER = $wpdb->query("SELECT * FROM ".$wpdb->prefix."IPBLC_usernames ORDER BY $orderby $order");
 
-		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_usernames ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
+		$resultX = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."IPBLC_usernames ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
 
 		//$totalIP=count($totalcomments);
 

@@ -13,7 +13,7 @@ if ( !defined('ABSPATH') )
 		$s_value="";
 		if(isset($_GET['search']))
 		{
-			$s_value=$_GET['search'];
+			$s_value=sanitize_text_field(mysql_real_escape_string($_GET['search']));
 		}
 
 	?>
@@ -43,19 +43,19 @@ global $wpdb;
 $IP_ID="";
 if(isset($_GET['del']))
 {
-	$IP_ID=$_GET['del'];
+	$IP_ID=sanitize_text_field(mysql_real_escape_string($_GET['del']));
 }
 
 
 
 
-	if($IP_ID)
+	if($IP_ID && is_numeric($IP_ID))
 	{
 
 echo "<BR>";
 
-		$IP=$wpdb->get_var("SELECT IP FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id='$IP_ID'");
-		$wpdb->query("DELETE FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id='$IP_ID'");
+		$IP=$wpdb->get_var($wpdb->prepare("SELECT IP FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id=%d",$IP_ID));
+		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id=%d",$IP_ID));
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
 <p><strong>IP Deleted from Blacklist.</strong></p></div>";
 $data = array('test' => '1');
@@ -82,25 +82,30 @@ $post_to_cloud =  file_get_contents (
 $mulitpleDelete="";
 if(isset($_GET['delX']))
 {
-	$mulitpleDelete=$_GET['delX'];
+	$mulitpleDelete=sanitize_text_field(mysql_real_escape_string($_GET['delX']));
+
+
 }
 
 
 	if($mulitpleDelete)
 	{
-		$explode=explode(",",$mulitpleDelete);
+		$explode=explode(",",urldecode($mulitpleDelete));
 
 		$IPData="";
 		$IPSep="";
 
 		foreach($explode as $IP_ID)
 		{
+			if(is_numeric($IP_ID))
+			{
+			$IP=$wpdb->get_var($wpdb->prepare("SELECT IP FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id=%d",$IP_ID));
+			$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id=%d",$IP_ID));
 
-		$IP=$wpdb->get_var("SELECT IP FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id='$IP_ID'");
-		$wpdb->query("DELETE FROM ".$wpdb->prefix."IPBLC_blacklist WHERE id='$IP_ID'");
-
-		$IPData.=$IPSep.$IP;
-		$IPSep=",";		
+			$IPData.=$IPSep.$IP;
+			$IPSep=",";
+			}
+		
 		}
 
 $data = array('test' => '1');
@@ -179,13 +184,13 @@ $page_num=$pageNum;
 $orderby="";
 if(isset($_GET['orderby']))
 {
-	$orderby=$_GET['orderby'];
+	$orderby=sanitize_text_field(mysql_real_escape_string($_GET['orderby']));
 }
 
 $order="";
 if(isset($_GET['order']))
 {
-	$order=$_GET['order'];
+	$order=sanitize_text_field(mysql_real_escape_string($_GET['order']));
 }
 
 $sort1="sortable";
@@ -246,15 +251,15 @@ else if($orderby=="lastvisit")
 
 
 
-		
+
 
 
 		if($s_value=="")
 		{
 
-		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order");
+		$totalIP = $wpdb->query("SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order");
 
-		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
+		$resultX = $wpdb->get_results("SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
 
 		//$totalIP=count($totalcomments);
 
@@ -262,10 +267,13 @@ else if($orderby=="lastvisit")
 		else
 		{
 			$ss=$s_value;
+		$sql1=$wpdb->prepare("SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP LIKE %s ORDER BY $orderby $order","%$ss%");
 
-		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP LIKE \"%$ss%\" ORDER BY $orderby $order");
 
-		$resultX = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist  WHERE IP LIKE \"%$ss%\" ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
+
+		$totalIP = $wpdb->query($sql1);
+
+		$resultX = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."IPBLC_blacklist  WHERE IP LIKE %s ORDER BY $orderby $order LIMIT $offset, $rowsPerPage","%$ss%"));
 
 
 

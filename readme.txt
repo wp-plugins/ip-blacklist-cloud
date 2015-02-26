@@ -3,8 +3,8 @@ Contributors: ad33lx
 Donate link: 
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
-Tested up to: 3.8
-Stable tag: 3.3
+Tested up to: 4.1.1
+Stable tag: 3.41
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,12 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 3.4.1 =
+* Fixed security exploits found by Mika Epstein
+
+= 3.4 =
+* Fixed security exploits found by Mika Epstein
 
 = 3.3 =
 * Fixed minor PHP Errors

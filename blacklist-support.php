@@ -38,7 +38,7 @@ global $wpdb;
 <h2> Support</h2>
 <BR>
 
-If you are facing any problem, you can contact me at <b>contact@adiie9.com</b>.<BR>
+If you are facing any problem, you can contact me at <b>contact@adiie9.com</b> or <b>ad33l@live.com</b><BR>
 <BR>
 
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">

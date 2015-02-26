@@ -29,39 +29,39 @@ global $wpdb;
 
 		if(isset($_POST['fix_all']))
 		{
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE  `USERNAME` `USERNAME` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE  `USERNAME` `USERNAME` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed ENGINE = MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ADD  `visits` INT( 50 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ADD  `visits` INT( 50 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ADD  `visits` INT( 50 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ADD  `visits` INT( 50 ) NOT NULL");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ADD  `lastvisit` INT( 50 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ADD  `lastvisit` INT( 50 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ADD  `lastvisit` INT( 50 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ADD  `lastvisit` INT( 50 ) NOT NULL");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `lastvisit`  `lastvisit` INT( 50 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `lastvisit`  `lastvisit` INT( 50 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `lastvisit`  `lastvisit` INT( 50 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `lastvisit`  `lastvisit` INT( 50 ) NOT NULL");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ADD  `timestamp` INT( 30 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ADD  `timestamp` INT( 30 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed ADD  `timestamp` INT( 30 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames ADD  `timestamp` INT( 30 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist ADD  `timestamp` INT( 30 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed ADD  `timestamp` INT( 30 ) NOT NULL");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `timestamp`  `timestamp` INT( 30 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `timestamp`  `timestamp` INT( 30 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `timestamp`  `timestamp` INT( 30 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `timestamp`  `timestamp` INT( 30 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `timestamp`  `timestamp` INT( 30 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `timestamp`  `timestamp` INT( 30 ) NOT NULL");
 
 
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `IP`  `IP` VARCHAR( 25 ) NOT NULL");
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `IP`  `IP` VARCHAR( 25 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `IP`  `IP` VARCHAR( 25 ) NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `IP`  `IP` VARCHAR( 25 ) NOT NULL");
 
-		$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `useragent`  `useragent` VARCHAR( 225 ) NOT NULL");
-	$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `variables`  `variables` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
+		$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `useragent`  `useragent` VARCHAR( 225 ) NOT NULL");
+	$wpdb->query( "ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `variables`  `variables` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL");
 
 
 
@@ -74,32 +74,14 @@ global $wpdb;
 		if(isset($_POST['fix_DB']))
 		{
 
-/*
-
-			//$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
-
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `lastvisit`  `lastvisit` INT( 50 ) NOT NULL");
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `IP`  `IP` VARCHAR( 25 ) NOT NULL");
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `IP`  `IP` VARCHAR( 25 ) NOT NULL");
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_blacklist CHANGE `timestamp`  `timestamp` INT( 30 ) NOT NULL");
-
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `lastvisit`  `lastvisit` INT( 50 ) NOT NULL");
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `timestamp`  `timestamp` INT( 30 ) NOT NULL");
-
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `timestamp`  `timestamp` INT( 25 ) NOT NULL");
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `useragent`  `useragent` VARCHAR( 225 ) NOT NULL");
-			$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_login_failed CHANGE `IP`  `IP` VARCHAR( 25 ) NOT NULL");
 
 
-*/
 
-			$wpdb->query("CREATE INDEX ipIndex on ".$wpdb->prefix."IPBLC_blacklist(`IP`,`visits`,`timestamp`)");
-			$wpdb->query("CREATE INDEX uIndex1 on ".$wpdb->prefix."IPBLC_usernames(`visits`,`timestamp`)");
-			$wpdb->query("CREATE INDEX uIndex1 on ".$wpdb->prefix."IPBLC_login_failed(`IP`,`timestamp`)");
-			$wpdb->query("CREATE FULLTEXT INDEX uIndex2 on ".$wpdb->prefix."IPBLC_usernames(`USERNAME`)");
-			$wpdb->query("CREATE FULLTEXT INDEX uIndex2 on ".$wpdb->prefix."IPBLC_login_failed(`variables`)");
+			$wpdb->query( "CREATE INDEX ipIndex on ".$wpdb->prefix."IPBLC_blacklist(`IP`,`visits`,`timestamp`)");
+			$wpdb->query( "CREATE INDEX uIndex1 on ".$wpdb->prefix."IPBLC_usernames(`visits`,`timestamp`)");
+			$wpdb->query( "CREATE INDEX uIndex1 on ".$wpdb->prefix."IPBLC_login_failed(`IP`,`timestamp`)");
+			$wpdb->query( "CREATE FULLTEXT INDEX uIndex2 on ".$wpdb->prefix."IPBLC_usernames(`USERNAME`)");
+			$wpdb->query( "CREATE FULLTEXT INDEX uIndex2 on ".$wpdb->prefix."IPBLC_login_failed(`variables`)");
 
 
 			echo "<div id='setting-error-settings_updated' class='updated settings-error'>
@@ -113,11 +95,8 @@ global $wpdb;
 		{
 
 
-			//$wpdb->query("ALTER TABLE  ".$wpdb->prefix."IPBLC_usernames CHANGE `visits`  `visits` INT( 50 ) NOT NULL");
-
-
-			$wpdb->query("CREATE INDEX ipIndexV on ".$wpdb->prefix."IPBLC_blacklist(`lastvisit`,`timestamp`)");
-			$wpdb->query("CREATE INDEX uIndexV on ".$wpdb->prefix."IPBLC_usernames(`lastvisit`,`timestamp`)");
+			$wpdb->query( "CREATE INDEX ipIndexV on ".$wpdb->prefix."IPBLC_blacklist(`lastvisit`,`timestamp`)");
+			$wpdb->query( "CREATE INDEX uIndexV on ".$wpdb->prefix."IPBLC_usernames(`lastvisit`,`timestamp`)");
 
 
 			echo "<div id='setting-error-settings_updated' class='updated settings-error'>
@@ -129,7 +108,7 @@ global $wpdb;
 
 
 
-			$cc=$wpdb->get_results("SHOW FIELDS from `".$wpdb->prefix."IPBLC_blacklist`");
+			$cc=$wpdb->get_results( "SHOW FIELDS from `".$wpdb->prefix."IPBLC_blacklist`");
 
 			$blc_fields=array();
 			$blc_fields_found=array();
@@ -200,7 +179,7 @@ global $wpdb;
 
 
 
-			$cc=$wpdb->get_results("SHOW FIELDS from `".$wpdb->prefix."IPBLC_usernames`");
+			$cc=$wpdb->get_results( "SHOW FIELDS from `".$wpdb->prefix."IPBLC_usernames`");
 
 			$user_fields=array();
 			$user_fields_found=array();
@@ -276,7 +255,7 @@ global $wpdb;
 
 
 
-			$cc=$wpdb->get_results("SHOW FIELDS from `".$wpdb->prefix."IPBLC_login_failed`");
+			$cc=$wpdb->get_results( "SHOW FIELDS from `".$wpdb->prefix."IPBLC_login_failed`");
 
 			$failed_fields=array();
 			$failed_fields_found=array();
@@ -356,7 +335,7 @@ global $wpdb;
 //-----check tables type---
 
 
-			$cc=$wpdb->get_results("SHOW TABLE STATUS FROM ".DB_NAME." LIKE '".$wpdb->prefix."IPBLC_blacklist'");
+			$cc=$wpdb->get_results( "SHOW TABLE STATUS FROM ".DB_NAME." LIKE '".$wpdb->prefix."IPBLC_blacklist'");
 
 //echo "<pre>";
 //		print_r($cc);
@@ -384,7 +363,7 @@ global $wpdb;
 //echo "</pre>";
 
 
-			$cc=$wpdb->get_results("SHOW TABLE STATUS FROM ".DB_NAME." LIKE '".$wpdb->prefix."IPBLC_usernames'");
+			$cc=$wpdb->get_results( "SHOW TABLE STATUS FROM ".DB_NAME." LIKE '".$wpdb->prefix."IPBLC_usernames'");
 
 //echo "<pre>";
 //		print_r($cc);
@@ -413,7 +392,7 @@ global $wpdb;
 
 
 
-			$cc=$wpdb->get_results("SHOW TABLE STATUS FROM ".DB_NAME." LIKE '".$wpdb->prefix."IPBLC_login_failed'");
+			$cc=$wpdb->get_results( "SHOW TABLE STATUS FROM ".DB_NAME." LIKE '".$wpdb->prefix."IPBLC_login_failed'");
 
 //echo "<pre>";
 //		print_r($cc);
@@ -617,7 +596,7 @@ global $wpdb;
 
 			$foundIndex=0;
 
-			$results=$wpdb->get_results("SHOW INDEX FROM ".$wpdb->prefix."IPBLC_blacklist");
+			$results=$wpdb->get_results( "SHOW INDEX FROM ".$wpdb->prefix."IPBLC_blacklist");
 
 
 			//print_r($results);
@@ -664,7 +643,7 @@ global $wpdb;
 
 			$foundIndex=0;
 
-			$results=$wpdb->get_results("SHOW INDEX FROM ".$wpdb->prefix."IPBLC_blacklist");
+			$results=$wpdb->get_results( "SHOW INDEX FROM ".$wpdb->prefix."IPBLC_blacklist");
 
 
 			//print_r($results);

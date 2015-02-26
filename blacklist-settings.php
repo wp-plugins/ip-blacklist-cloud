@@ -5,6 +5,7 @@ if ( !defined('ABSPATH') )
 
 
 
+global $this_plugin_url;
 ?>
 
 
@@ -28,29 +29,17 @@ if ( !defined('ABSPATH') )
 <div id="icon-options-general" class="icon32"><br /></div>  
 
 <h2>Plugin Settings</h2>
-
-
-
 <?php
 
-global $wpdb;
-
-
-		update_option('IPBLC_cloud_email',"");
-		update_option('IPBLC_cloud_key',"");
+		global $wpdb;
 
 
 	if(isset($_POST['update_IPBLC']))
 	{
 
-		//update_option('IPBLC_auto_comments',$_POST['auto_comments']);
-		//update_option('IPBLC_protected',$_POST['IPBLC_protected']);
-		update_option('IPBLC_failed_sort_status',$_POST['IPBLC_failed_sort_status']);
-
-
-
-		//$cloudemail=$_POST['cloud_email'];
-		//$cloudkey=$_POST['cloud_key'];
+		//update_option('IPBLC_auto_comments',sanitize_text_field(mysql_real_escape_string($_POST['auto_comments'])));
+		update_option('IPBLC_protected',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_protected'])));
+		update_option('IPBLC_failed_sort_status',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_failed_sort_status'])));
 
 
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
@@ -61,7 +50,7 @@ global $wpdb;
 	if(isset($_POST['update_cloud_connect']))
 	{
 
-		update_option('IPBLC_cloud_on',$_POST['IPBLC_cloud_on']);
+		update_option('IPBLC_cloud_on',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_cloud_on'])));
 		update_option('IPBLC_cloud_password',$_POST['IPBLC_cloud_password']);
 
 
@@ -85,14 +74,14 @@ global $wpdb;
 	}
 
 
-/*
+
 	$IPBLC_protected=get_option('IPBLC_protected');
 	if(!$IPBLC_protected)
 	{
 		update_option('IPBLC_protected','2');
 		$IPBLC_protected=get_option('IPBLC_protected');
 	}
-*/
+
 
 
 
@@ -100,9 +89,9 @@ global $wpdb;
 	if(isset($_POST['update_IPBLC_failedlogin']))
 	{
 
-		update_option('IPBLC_failedlogin_max',$_POST['IPBLC_failedlogin_max']);
-		update_option('IPBLC_failedlogin_time',$_POST['IPBLC_failedlogin_time']);
-		update_option('IPBLC_failedlogin_email',$_POST['IPBLC_failedlogin_email']);
+		update_option('IPBLC_failedlogin_max',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_failedlogin_max'])));
+		update_option('IPBLC_failedlogin_time',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_failedlogin_time'])));
+		update_option('IPBLC_failedlogin_email',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_failedlogin_email'])));
 
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
 <p><strong>Settings saved.</strong></p></div>";
@@ -134,17 +123,18 @@ global $wpdb;
 <h3>Settings</h3>
 
 <div class="updated settings-error below-h2">
-<b style="color: #FF0000;">NOTE:</b> If <i style="color: #000099;">Allow "Sort by IP status" in failed login page</i> is set to YES and does not show any data in "Failed Login" page, please set this option to NO.</b><BR>
+<p>
+<b style="color: #FF0000;">NOTE:</b> If <i style="color: #000099;">Allow "Sort by IP status" in failed login page</i> is set to YES and does not show any data in "Failed Login" page, please set this option to NO.</b></p>
+
 </div>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 650px;">
 
-<?php
-/*
-?>
+
+
 <tr valign="top">
 <td>
-<b>Show "<?php  echo "Protected with <a href=\"http://www.ip-finder.me\"><img src=\"".plugins_url()."/ip-blacklist-cloud/icon.png\" style=\"display: inline;\">IP Blacklist Cloud</a>"; ?>" message below comments form:</b> 
+<b>Show "<?php  echo "Protected with <a href=\"http://www.ip-finder.me\"><img src=\"".$this_plugin_url."icon.png\" style=\"display: inline;\">IP Blacklist Cloud</a>"; ?>" message below comments form:</b> 
 </td>
 <td>
 <select id="IPBLC_protected" name="IPBLC_protected"  style="width: 80px;">
@@ -169,9 +159,8 @@ $optioni_2="selected";
 </select>
 </td>
 </tr>
-<?php
-*/
-?>
+
+
 
 <tr valign="top">
 <td>
@@ -262,7 +251,10 @@ Send Email on Auto Block:
 
 <h3>Import/Export Blacklisted IP and Usernames Database</h3>
 <div class="updated settings-error below-h2">
-<b>Tired of importing / exporting among your websites? Get <a href="http://www.ip-finder.me/ipblc-server/" target=_blank style="color: red">IP Blacklist Cloud Server</a> Now!</b></div>
+<p>
+<b>Tired of importing / exporting among your websites? Get <a href="http://www.ip-finder.me/ipblc-server/" target=_blank style="color: red">IP Blacklist Cloud Server</a> Now!</b>
+</p>
+</div>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 550px;">
 
@@ -311,7 +303,24 @@ else
 	if(strtolower($ext)=="csv")
 	{
 		$tempName=$fileX['tmp_name'];
-		$filename=$upload_dir."/".$fileX['name'];
+
+		$csv_folder=$upload_dir."/ipblc_csv/";
+
+		$empty_index=$upload_dir."/ipblc_csv/index.php";
+
+		if (!is_dir($csv_folder))
+		{
+			mkdir($csv_folder);         
+		}
+
+		if(!file_exists($empty_index))
+		{
+			$file_data="You are not allowed to view content of this folder.";
+			file_put_contents($empty_index,$file_data);
+		}
+
+
+		$filename=$upload_dir."/ipblc_csv/".$fileX['name'];
 
 
 
@@ -581,8 +590,9 @@ function submitToDBUsername(username)
 
 <BR><BR>
 <div id="setting-error-settings_updated" class="updated settings-error below-h2">
-
+<p>
 <b>What is <a href="http://www.ip-finder.me/ipblc-server/" target=_blank  style="color: red">IP Blacklist Cloud Server</a>?</b>
+</p>
 </div>
 
 <table cellspacing=2 cellpadding=2 class="form-table" style="width: 650px;">

@@ -20,13 +20,16 @@ global $wpdb,$IP_globale,$IP_error,$found;
 	if(isset($_POST['update_autoblock']))
 	{
 
-		update_option('IPBLC_autoblock',$_POST['autoblock']);
+		$auto_block=sanitize_text_field(mysql_real_escape_string($_POST['autoblock']));
+
+		update_option('IPBLC_autoblock',$auto_block);
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
 <p><strong>Block list Updated!</strong></p></div>";
 
 	}
 
 	$IPBLC_autoblock=get_option('IPBLC_autoblock');
+	$IPBLC_autoblock=str_replace('\r\n',"\r\n",$IPBLC_autoblock);
 
 ?>
 

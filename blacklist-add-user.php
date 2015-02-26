@@ -14,21 +14,17 @@ if ( !defined('ABSPATH') )
 	if(isset($_POST['blacklist']))
 	{
 		$USER=$_POST['blacklist'];
-
-	$USER=urldecode($USER);
-	$USER=str_replace("\'","'",$USER);
-	$USER=str_replace("\\\'","'",$USER);
-	$USER=str_replace("\\\"",'\"',$USER);
-	$USER=str_replace("\\\"",'"',$USER);
-	$USER=str_replace("\"","&quot;",$USER);
+		$USER=sanitize_text_field(mysql_real_escape_string($USER));
 
 
 		if($USER)
 		{
 
  			 // it's valid
+			$sql=$wpdb->prepare("SELECT id FROM ".$wpdb->prefix."IPBLC_usernames WHERE USERNAME=%s",$USER);
+			//echo $sql."<BR>";
 
-			$USER_in_DB=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_usernames WHERE USERNAME=\"$USER\"");
+			$USER_in_DB=$wpdb->get_var($sql);
 
 			$found=false;
 			//$found=true;
@@ -38,7 +34,9 @@ if ( !defined('ABSPATH') )
 				$table=$wpdb->prefix."IPBLC_usernames";
 				$time=time();
 
-				$wpdb->query("INSERT INTO $table (USERNAME,timestamp,visits,lastvisit) VALUES('$USER','$time',0,0)");
+				$sql=$wpdb->prepare("INSERT INTO $table (USERNAME,timestamp,visits,lastvisit) VALUES(%s,%d,%d,%d)",array($USER,$time,0,0));
+
+				$wpdb->query($sql);
 				//$wpdb->print_error();
 
 				//---post blacklist data to ip-finder.me

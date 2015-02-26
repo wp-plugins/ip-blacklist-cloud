@@ -9,6 +9,7 @@ if ( !defined('ABSPATH') )
 <h2>Add IP to Blacklist</h2>
 <BR>
 <B>NOTE:</B> After adding any IP to blacklist, please submit comment on IP-FINDER.ME to help others regarding the issue related to that specific IP.
+
 <BR>
 <?php
 
@@ -16,13 +17,15 @@ if ( !defined('ABSPATH') )
 
 	if(isset($_POST['blacklist']))
 	{
-		$IP=$_POST['blacklist'];
+
+
+		$IP=sanitize_text_field(mysql_real_escape_string($_POST['blacklist']));
 
 		if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
 		{
 
  			 // it's valid
-			$IP_in_DP=$wpdb->get_var("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP='$IP'");
+			$IP_in_DP=$wpdb->get_var($wpdb->prepare("SELECT id FROM ".$wpdb->prefix."IPBLC_blacklist WHERE IP=%s",$IP));
 
 			$found=false;
 
@@ -34,7 +37,13 @@ if ( !defined('ABSPATH') )
 				$table=$wpdb->prefix."IPBLC_blacklist";
 				$time=time();
 
-				$wpdb->query("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES('$IP','$time',0,0)");
+				$sql=$wpdb->prepare("INSERT INTO $table (IP,timestamp,visits,lastvisit) VALUES(%s,%d,%d,%d)",array($IP,$time,0,0));
+
+				//echo "<pre>";
+					//print_r($sql);
+				//echo "</pre>";
+
+				$wpdb->query($sql);
 
 				//$wpdb->print_error();
 

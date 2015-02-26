@@ -10,7 +10,11 @@ if ( !defined('ABSPATH') )
 
 
 global $wpdb;
-	$my_IP=$_SERVER['REMOTE_ADDR'];
+	if(isset($_SERVER['REMOTE_ADDR']))
+	{
+		$my_IP=$_SERVER['REMOTE_ADDR'];
+	}
+
 
 	$IPBLC_failed_sort_status=get_option('IPBLC_failed_sort_status');
 
@@ -90,15 +94,14 @@ $page_num=$pageNum;
 $orderby="";
 if(isset($_GET['orderby']))
 {
-	$orderby=$_GET['orderby'];
+	$orderby=sanitize_text_field(mysql_real_escape_string($_GET['orderby']));
 }
 
 $order="";
 if(isset($_GET['order']))
 {
-	$order=$_GET['order'];
+	$order=sanitize_text_field(mysql_real_escape_string($_GET['order']));
 }
-
 
 $sort1="sortable";
 $sort2="sortable";
@@ -171,11 +174,8 @@ else if($orderby=="blc")
 
 
 
-		$totalIP = $wpdb->query( "SELECT DISTINCT(IP), id, COUNT(IP) as countx,timestamp FROM ".$wpdb->prefix."IPBLC_login_failed  GROUP BY IP  ORDER BY $orderby $order");
+		$totalIP = $wpdb->query("SELECT DISTINCT(IP), id, COUNT(IP) as countx,timestamp FROM ".$wpdb->prefix."IPBLC_login_failed  GROUP BY IP  ORDER BY $orderby $order");
 
-/*
-		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx,timestamp, FROM ".$wpdb->prefix."IPBLC_login_failed GROUP BY IP ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
-*/
 		$table1=$wpdb->prefix."IPBLC_login_failed";
 		$table2=$wpdb->prefix."IPBLC_blacklist";
 
@@ -191,7 +191,7 @@ else if($orderby=="blc")
 
 		}
 
-		$resultX = $wpdb->get_results( "SELECT  DISTINCT(IP), id, COUNT(IP) as countx, timestamp  $extraSearch
+		$resultX = $wpdb->get_results("SELECT  DISTINCT(IP), id, COUNT(IP) as countx, timestamp  $extraSearch
  FROM ".$wpdb->prefix."IPBLC_login_failed GROUP BY IP ORDER BY $orderby $order LIMIT $offset, $rowsPerPage");
 
 

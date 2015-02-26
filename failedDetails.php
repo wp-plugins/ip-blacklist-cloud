@@ -4,6 +4,7 @@ if ( !defined('ABSPATH') )
     die ( 'No direct script access allowed' );
 
 
+global $this_plugin_url;
 
 ?>
 
@@ -32,8 +33,8 @@ if(!$manage)
 	<meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="<?php echo plugins_url()."/ip-blacklist-cloud/bootstrap.css"; ?>" rel="stylesheet">
-    <link href="<?php echo plugins_url()."/ip-blacklist-cloud/bootstrap-responsive.css"; ?>" rel="stylesheet">
+    <link href="<?php echo $this_plugin_url."bootstrap.css"; ?>" rel="stylesheet">
+    <link href="<?php echo $this_plugin_url."bootstrap-responsive.css"; ?>" rel="stylesheet">
 </head>
 <body>
 <div class="container">
@@ -57,10 +58,10 @@ $page_num=$pageNum;
 //---------------------------------------------------------------------------------
 
 
-		$totalIP = $wpdb->query( "SELECT * FROM ".$wpdb->prefix."IPBLC_login_failed  WHERE IP=\"$IP\"  ORDER BY timestamp desc");
+$totalIP = $wpdb->query($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."IPBLC_login_failed  WHERE IP=%s  ORDER BY timestamp desc",$IP));
 
 
-		$resultX = $wpdb->get_results(  "SELECT * FROM ".$wpdb->prefix."IPBLC_login_failed  WHERE IP=\"$IP\"  ORDER BY timestamp desc LIMIT $offset, $rowsPerPage");
+$resultX = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."IPBLC_login_failed  WHERE IP=%s ORDER BY timestamp desc LIMIT $offset, $rowsPerPage",$IP));
 
 
 
