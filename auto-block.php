@@ -20,7 +20,7 @@ global $wpdb,$IP_globale,$IP_error,$found;
 	if(isset($_POST['update_autoblock']))
 	{
 
-		$auto_block=sanitize_text_field(mysql_real_escape_string($_POST['autoblock']));
+		$auto_block=sanitize_text_field($_POST['autoblock']);
 
 		update_option('IPBLC_autoblock',$auto_block);
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 

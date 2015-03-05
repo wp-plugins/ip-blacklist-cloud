@@ -4,7 +4,7 @@ Donate link:
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
 Tested up to: 4.1.1
-Stable tag: 3.41
+Stable tag: 3.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,7 +29,7 @@ Note: Before downloading and installing plugin, you must accept that plugin send
 SpamChecker sends comments data (Name, Email, URL and Comment) to check Spam Percentages based on our database.
 
 
-1. Upload `ip_blacklist_cloud` folder to the `/wp-content/plugins/` directory
+1. Upload 'ip_blacklist_cloud' folder to the '/wp-content/plugins/' directory
 
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
@@ -90,6 +90,9 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 3.4.2 =
+* Quick Fix - Fixed mysql_real_escape_string() warning
 
 = 3.4.1 =
 * Fixed security exploits found by Mika Epstein

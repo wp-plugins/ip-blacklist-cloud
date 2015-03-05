@@ -3,7 +3,7 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
-Version: 3.41
+Version: 3.4.2
 Author: Adeel Ahmed
 Author URI: http://www.ip-finder.me/
 */
@@ -27,7 +27,7 @@ function ip_added()
 {
 	global $wpdb,$found,$IP_global, $IP_error;
 
-	$IP=sanitize_text_field(mysql_real_escape_string($_GET['blacklist']));
+	$IP=sanitize_text_field($_GET['blacklist']);
 
 	//---check if IP is valid IPV4 or not before checking already added---
 	if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
@@ -80,7 +80,7 @@ function user_added()
 	global $wpdb,$found,$USER_global, $USER_error;
 
 	$USER=$_POST['blacklistuser'];
-	$USER=sanitize_text_field(mysql_real_escape_string($USER));
+	$USER=sanitize_text_field($USER);
 
 	$USER_in_DB=$wpdb->get_var($wpdb->prepare("SELECT id FROM ".$wpdb->prefix."IPBLC_usernames WHERE USERNAME=%s",$USER));
 
@@ -198,8 +198,6 @@ function user_added_message()
 	$USER=str_replace('\"','"',$USER);
 	$USER=str_replace("\'","'",$USER);
 	$USER=str_replace("\\\'","'",$USER);
-
-	$USER=mysql_real_escape_string($USER);
 
 	if(!$found)
 	{
@@ -512,7 +510,7 @@ function IPBLC_IP_value( $column, $comment_ID )
 	</span> | 
 	<span class="edit">';
 
-	$my_IP=mysql_real_escape_string($_SERVER['REMOTE_ADDR']);
+	$my_IP=$_SERVER['REMOTE_ADDR'];
 
 		if($my_IP!=$IP)
 		{
@@ -570,7 +568,7 @@ function IPBLC_IP_value( $column, $comment_ID )
 			$authorName2=str_replace("\"","&quot;",$authorName);
 
 */
-			$authorName2=sanitize_text_field(mysql_real_escape_string($authorName2));
+			$authorName2=sanitize_text_field($authorName2);
 
 		$USERNAME_in_DP=$wpdb->get_var($wpdb->prepare("SELECT id FROM ".$wpdb->prefix."IPBLC_usernames WHERE USERNAME=%s",$authorName2));
 
@@ -655,7 +653,7 @@ function create_sql()
 	{
 
 
-		$referer=sanitize_text_field(mysql_real_escape_string($_SERVER['HTTP_REFERER']));
+		$referer=sanitize_text_field($_SERVER['HTTP_REFERER']);
 		if(strpos($referer,"edit-comments.php")>0)
 		{
 			ip_added();
@@ -669,7 +667,7 @@ function create_sql()
 
 		//print_r($_SERVER);
 
-		$referer=sanitize_text_field(mysql_real_escape_string($_SERVER['HTTP_REFERER']));
+		$referer=sanitize_text_field($_SERVER['HTTP_REFERER']);
 		if(strpos($referer,"edit-comments.php")>0)
 		{
 			user_added();
@@ -739,7 +737,7 @@ $link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
 
 	if(isset($_SERVER['REMOTE_ADDR']))
 	{
-		$IP=sanitize_text_field(mysql_real_escape_string($_SERVER['REMOTE_ADDR']));
+		$IP=sanitize_text_field($_SERVER['REMOTE_ADDR']);
 	}
 
 	if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
@@ -792,7 +790,7 @@ $link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
 	if(isset($_POST['author']))
 	{
 		$author=$_POST['author'];
-		$USER=sanitize_text_field(mysql_real_escape_string($author));
+		$USER=sanitize_text_field($author);
 
 
 		$USER_in_DB=$wpdb->get_var($wpdb->prepare("SELECT id FROM ".$wpdb->prefix."IPBLC_usernames WHERE USERNAME=%s",$USER));
@@ -974,7 +972,7 @@ $link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
 
 				if(isset($_GET['IP']))
 				{
-					$IP=sanitize_text_field(mysql_real_escape_string($_GET['IP']));
+					$IP=sanitize_text_field($_GET['IP']);
 				}
 
 				if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
@@ -1032,7 +1030,7 @@ $link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
 
 				if(isset($_GET['IP']))
 				{
-					$IP=sanitize_text_field(mysql_real_escape_string($_GET['IP']));
+					$IP=sanitize_text_field($_GET['IP']);
 				}
 
 				if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
@@ -1439,7 +1437,7 @@ $link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
 			$IP="";
 			if($_GET['IP'])
 			{
-					$IP=sanitize_text_field(mysql_real_escape_string($_GET['IP']));
+					$IP=sanitize_text_field($_GET['IP']);
 			}
 
 			if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
@@ -1496,7 +1494,7 @@ $link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
 				$IPx="";
 				if($_GET['IP'])
 				{
-					$IPx=sanitize_text_field(mysql_real_escape_string($_GET['IP']));
+					$IPx=sanitize_text_field($_GET['IP']);
 				}
 
 				$IPx=explode(",",$IPx);
@@ -1572,7 +1570,7 @@ $link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
 			$IP="";
 			if($_GET['IP'])
 			{
-					$IP=sanitize_text_field(mysql_real_escape_string($_GET['IP']));
+					$IP=sanitize_text_field($_GET['IP']);
 			}
 			if($IPBLC_cloud_password && $IPBLC_cloud_on==2 && $IPBLC_cloud_password==$pwd)
 			{
@@ -1659,7 +1657,7 @@ $link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?I
 				$IP="";
 				if($_GET['IP'])
 				{
-					$IP=sanitize_text_field(mysql_real_escape_string($_GET['IP']));
+					$IP=sanitize_text_field($_GET['IP']);
 				}
 				if(!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
 				{
@@ -1709,7 +1707,7 @@ $link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?I
 			{
 
 				$USER=$_POST['blacklistuser'];
-				$USER=sanitize_text_field(mysql_real_escape_string($USER));
+				$USER=sanitize_text_field($USER);
 
 
 				$sql=$wpdb->prepare("SELECT id FROM ".$wpdb->prefix."IPBLC_usernames WHERE USERNAME=%s",$USER);
@@ -1774,7 +1772,7 @@ $link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?I
 				$IP="";
 				if($_POST['blacklist'])
 				{
-					$IP=sanitize_text_field(mysql_real_escape_string($_POST['blacklist']));
+					$IP=sanitize_text_field($_POST['blacklist']);
 				}
 				if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
 				{
@@ -1930,7 +1928,7 @@ $link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?I
 				$IP="";
 				if($_POST['IP'])
 				{
-					$IP=sanitize_text_field(mysql_real_escape_string($_POST['IP']));
+					$IP=sanitize_text_field($_POST['IP']);
 				}
 				$found="";
 				if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
@@ -1963,7 +1961,7 @@ $link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete.php?I
 
 				$USER=$_POST['USER'];
 				$found="";
-				$USER=sanitize_text_field(mysql_real_escape_string($USER));
+				$USER=sanitize_text_field($USER);
 
 				if($USER)
 				{
@@ -2033,9 +2031,9 @@ function IPBLC_login_failed(){
 
 	$postedData="";
 	//print_r($_SERVER);
-	$visitorIP=sanitize_text_field(mysql_real_escape_string($_SERVER['REMOTE_ADDR']));
-	$visitor_time=sanitize_text_field(mysql_real_escape_string($_SERVER['REQUEST_TIME']));
-	$visitor_user_agent=sanitize_text_field(mysql_real_escape_string($_SERVER['HTTP_USER_AGENT']));
+	$visitorIP=sanitize_text_field($_SERVER['REMOTE_ADDR']);
+	$visitor_time=sanitize_text_field($_SERVER['REQUEST_TIME']);
+	$visitor_user_agent=sanitize_text_field($_SERVER['HTTP_USER_AGENT']);
 
 	$IPBLC_failedlogin_email=get_option('IPBLC_failedlogin_email');
 
@@ -2059,7 +2057,7 @@ function IPBLC_login_failed(){
 		$login_user="";
 		if(isset($_POST['log']))
 		{
-			$login_user=sanitize_text_field(mysql_real_escape_string($_POST['log']));
+			$login_user=sanitize_text_field($_POST['log']);
 		}
 
 		$IPBLC_autoblock=get_option('IPBLC_autoblock');
@@ -2194,7 +2192,7 @@ function IPJS()
 	if(isset($_GET['blacklist']))
 	{
 		//print_r($_SERVER);
-		$referer=sanitize_text_field(mysql_real_escape_string($_SERVER['HTTP_REFERER']));
+		$referer=sanitize_text_field($_SERVER['HTTP_REFERER']);
 
 	
 		if(strpos($referer,"edit-comments.php")>0)
@@ -2208,7 +2206,7 @@ function IPJS()
 	elseif(isset($_GET['blacklistuser']))
 	{
 		//print_r($_SERVER);
-		$referer=sanitize_text_field(mysql_real_escape_string($_SERVER['HTTP_REFERER']));
+		$referer=sanitize_text_field($_SERVER['HTTP_REFERER']);
 		if(strpos($referer,"edit-comments.php")>0)
 		{
 			user_added_message();
@@ -2811,7 +2809,7 @@ function auto_blacklist_spam_multi()
 
 				foreach($comments as $commentID)
 				{
-					$commentX=get_comment(sanitize_text_field(mysql_real_escape_string($commentID)) );
+					$commentX=get_comment(sanitize_text_field($commentID) );
 					//print_r($commentX);
 					$IP=$commentX->comment_author_IP;
 
@@ -2840,7 +2838,7 @@ function auto_blacklist_spam_multi()
 			}
 			elseif(isset($_POST['id']))
 			{
-					$commentX=get_comment(sanitize_text_field(mysql_real_escape_string($_POST['id'])) );
+					$commentX=get_comment(sanitize_text_field($_POST['id']) );
 					//print_r($commentX);
 					$IP=$commentX->comment_author_IP;
 

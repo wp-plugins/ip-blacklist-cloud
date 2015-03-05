@@ -31,7 +31,7 @@ global $wpdb;
 $USER_ID="";
 if(isset($_GET['del']))
 {
-	$USER_ID=sanitize_text_field(mysql_real_escape_string($_GET['del']));
+	$USER_ID=sanitize_text_field($_GET['del']);
 }
 
 
@@ -79,7 +79,7 @@ $context = stream_context_create (array ( 'http' => $contextData ));
 
 // Read page rendered as result of your POST request
 
-$USER2=urlencode(sanitize_text_field(mysql_real_escape_string($USER)));
+$USER2=urlencode(sanitize_text_field($USER));
 
 
 $link="http://www.ip-finder.me/wp-content/themes/ipfinder/blacklist_delete_user.php?USER=".$USER2."&website=".urlencode(site_url())."&website_name=".urlencode(get_bloginfo('name'));
@@ -147,13 +147,13 @@ $page_num=$pageNum;
 $orderby="";
 if(isset($_GET['orderby']))
 {
-	$orderby=sanitize_text_field(mysql_real_escape_string($_GET['orderby']));
+	$orderby=sanitize_text_field($_GET['orderby']);
 }
 
 $order="";
 if(isset($_GET['order']))
 {
-	$order=sanitize_text_field(mysql_real_escape_string($_GET['order']));
+	$order=sanitize_text_field($_GET['order']);
 }
 
 

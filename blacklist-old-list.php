@@ -24,7 +24,7 @@ global $check_all_url_open;
 		$s_value="";
 		if(isset($_GET['search']))
 		{
-			$s_value=sanitize_text_field(mysql_real_escape_string($_GET['search']));
+			$s_value=sanitize_text_field($_GET['search']);
 		}
 
 	?>
@@ -69,7 +69,7 @@ global $wpdb;
 $IP_ID="";
 if(isset($_GET['del']))
 {
-	$IP_ID=sanitize_text_field(mysql_real_escape_string($_GET['del']));
+	$IP_ID=sanitize_text_field($_GET['del']);
 }
 
 
@@ -108,7 +108,7 @@ $post_to_cloud =  file_get_contents (
 $mulitpleDelete="";
 if(isset($_GET['delX']))
 {
-	$mulitpleDelete=sanitize_text_field(mysql_real_escape_string($_GET['delX']));
+	$mulitpleDelete=sanitize_text_field($_GET['delX']);
 }
 
 	if($mulitpleDelete)
@@ -216,13 +216,13 @@ $page_num=$pageNum;
 $orderby="";
 if(isset($_GET['orderby']))
 {
-	$orderby=sanitize_text_field(mysql_real_escape_string($_GET['orderby']));
+	$orderby=sanitize_text_field($_GET['orderby']);
 }
 
 $order="";
 if(isset($_GET['order']))
 {
-	$order=sanitize_text_field(mysql_real_escape_string($_GET['order']));
+	$order=sanitize_text_field($_GET['order']);
 }
 
 $sort1="sortable";

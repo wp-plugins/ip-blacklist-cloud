@@ -94,13 +94,13 @@ $page_num=$pageNum;
 $orderby="";
 if(isset($_GET['orderby']))
 {
-	$orderby=sanitize_text_field(mysql_real_escape_string($_GET['orderby']));
+	$orderby=sanitize_text_field($_GET['orderby']);
 }
 
 $order="";
 if(isset($_GET['order']))
 {
-	$order=sanitize_text_field(mysql_real_escape_string($_GET['order']));
+	$order=sanitize_text_field($_GET['order']);
 }
 
 $sort1="sortable";

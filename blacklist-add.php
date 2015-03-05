@@ -19,7 +19,7 @@ if ( !defined('ABSPATH') )
 	{
 
 
-		$IP=sanitize_text_field(mysql_real_escape_string($_POST['blacklist']));
+		$IP=sanitize_text_field($_POST['blacklist']);
 
 		if(filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
 		{

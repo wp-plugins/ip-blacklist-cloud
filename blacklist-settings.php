@@ -37,9 +37,9 @@ global $this_plugin_url;
 	if(isset($_POST['update_IPBLC']))
 	{
 
-		//update_option('IPBLC_auto_comments',sanitize_text_field(mysql_real_escape_string($_POST['auto_comments'])));
-		update_option('IPBLC_protected',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_protected'])));
-		update_option('IPBLC_failed_sort_status',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_failed_sort_status'])));
+		//update_option('IPBLC_auto_comments',sanitize_text_field($_POST['auto_comments']));
+		update_option('IPBLC_protected',sanitize_text_field($_POST['IPBLC_protected']));
+		update_option('IPBLC_failed_sort_status',sanitize_text_field($_POST['IPBLC_failed_sort_status']));
 
 
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
@@ -50,7 +50,7 @@ global $this_plugin_url;
 	if(isset($_POST['update_cloud_connect']))
 	{
 
-		update_option('IPBLC_cloud_on',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_cloud_on'])));
+		update_option('IPBLC_cloud_on',sanitize_text_field($_POST['IPBLC_cloud_on']));
 		update_option('IPBLC_cloud_password',$_POST['IPBLC_cloud_password']);
 
 
@@ -89,9 +89,9 @@ global $this_plugin_url;
 	if(isset($_POST['update_IPBLC_failedlogin']))
 	{
 
-		update_option('IPBLC_failedlogin_max',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_failedlogin_max'])));
-		update_option('IPBLC_failedlogin_time',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_failedlogin_time'])));
-		update_option('IPBLC_failedlogin_email',sanitize_text_field(mysql_real_escape_string($_POST['IPBLC_failedlogin_email'])));
+		update_option('IPBLC_failedlogin_max',sanitize_text_field($_POST['IPBLC_failedlogin_max']));
+		update_option('IPBLC_failedlogin_time',sanitize_text_field($_POST['IPBLC_failedlogin_time']));
+		update_option('IPBLC_failedlogin_email',sanitize_text_field($_POST['IPBLC_failedlogin_email']));
 
 		echo "<div id='setting-error-settings_updated' class='updated settings-error'> 
 <p><strong>Settings saved.</strong></p></div>";

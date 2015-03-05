@@ -14,7 +14,7 @@ if ( !defined('ABSPATH') )
 	if(isset($_POST['blacklist']))
 	{
 		$USER=$_POST['blacklist'];
-		$USER=sanitize_text_field(mysql_real_escape_string($USER));
+		$USER=sanitize_text_field($USER);
 
 
 		if($USER)
