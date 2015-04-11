@@ -18,7 +18,7 @@ global $wpdb,$IP_globale,$IP_error,$found;
 	if(isset($_POST['update_whitelist']))
 	{
 
-		$white=sanitize_text_field($_POST['whitelist']);
+		$white=trim($_POST['whitelist']);
 
 
 		update_option('IPBLC_whitelist',$white);
