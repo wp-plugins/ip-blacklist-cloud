@@ -3,12 +3,10 @@
 Plugin Name: IP Blacklist Cloud
 Plugin URI: http://wordpress.org/extend/plugins/ip-blacklist-cloud/
 Description: Blacklist IP Addresses from visiting your WordPress website and block usernames from spamming. View details of all failed login attempts.
-Version: 3.44
+Version: 4.00
 Author: Adeel Ahmed
 Author URI: http://www.ip-finder.me/
 */
-
-
 
 
 if ( !defined('ABSPATH') )
@@ -346,6 +344,7 @@ function page_IPBLC_actions()
 	}
 
 
+	add_submenu_page( "wp-IPBLC", "IP Range", "IP Range", "manage_options", "wp-IPBLC-ip-range", "blacklist_ip_range" );
 	add_submenu_page( "wp-IPBLC", "Support", "Support", "manage_options", "wp-IPBLC-support", "blacklist_support" );
 
 
@@ -451,6 +450,12 @@ function blacklist_whitelist()
 {
 	include "whitelist.php";
 }
+
+function blacklist_ip_range()
+{
+	include "blacklist-ip-range.php";
+}
+
 
 function blacklist_stats()
 {
@@ -783,6 +788,81 @@ $link="http://www.ip-finder.me/lastUpdate.php?website=".urlencode(site_url());
 	<?php
 		exit();
 		}
+
+	//-----check ip in range-----
+
+	$IP_ok=1;
+
+	$IPBLC_ip_range=get_option('IPBLC_ip_range');
+
+	$IPBLC_ip_range=trim($IPBLC_ip_range);
+	$IPBLC_ip_range=str_replace("\r\n","\n",$IPBLC_ip_range);
+	$IPBLC_ip_range=str_replace(" ","",$IPBLC_ip_range);
+
+	$ranges=explode("\n",$IPBLC_ip_range);
+
+	if(count($ranges)>0)
+	{
+		foreach($ranges as $range)
+		{
+			$rr=explode("-",$range);
+			if(count($rr)>0)
+			{
+				$start=$rr[0];
+				$end=$rr[1];
+
+				$start_l=ip2long($start);
+				$end_l=ip2long($end);
+
+				$ip_l=ip2long($IP);
+
+				//echo "check ip $ip_l in $start_l AND $end_l<BR>";
+				if($ip_l>=$start_l && $ip_l<=$end_l)
+				{
+					$IP_ok=0;
+				}
+
+			}
+
+		}
+
+
+	}
+
+	if($IP_ok==0)
+	{
+//show 404 error
+header("Status: 404 Not Found");
+header("HTTP/1.0 404 Not Found");
+
+	?>
+
+
+
+<head><title><?php echo get_bloginfo('name'); ?></title></head>
+<style>
+#IPBLC_message_blacklist
+{
+	border:1px solid #FF9999;
+	background-color: #FFDDDD;
+	font-size: 20px;
+	//font-weight: bold;
+	padding: 12px;
+	color: #000000;
+	margin-top: 50px;
+}
+
+</style>
+<center>
+<div id="IPBLC_message_blacklist">Your IP <?php echo $IP; ?> has been blacklisted!</div><BR>
+</center>
+	<?php
+		exit();
+	}
+
+
+	//-----END check ip in range-----
+
 
 	}
 

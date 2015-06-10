@@ -3,8 +3,8 @@ Contributors: ad33lx
 Donate link: 
 Tags: comments, spam, IP, blacklist, cloud, IP cloud, block, spamming, secure, failed login, hack attempt, auto block login
 Requires at least: 3.3
-Tested up to: 4.1.1
-Stable tag: 3.44
+Tested up to: 4.2.2
+Stable tag: 4.00
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,9 @@ http://demo.ip-finder.me/demo-details/
 
 
 == Changelog ==
+
+= 4.00 =
+* Added Block IP Range option. Note: This will not support Standalone Script (explained in Extra Security menu)
 
 = 3.43 =
 * Quick Fix - Auto block usernames and whitelist single line problem fixed.
